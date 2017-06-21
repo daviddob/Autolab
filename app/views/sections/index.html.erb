@@ -21,8 +21,6 @@
         <div class="collapsible-header"><i class="material-icons"></i><h5>Section Options</h5></div>
         <div class="collapsible-body">
           <ul class="options">
-            <li><%= link_to "Manage sections", [:edit, @course], 
-                { title: "Modify the properties for this course" } %></li>
             <li><%= link_to "Manage students in each section", [:users, @course],
                 { title: "Create, modify, and delete user accounts" } %></li>
           </ul>

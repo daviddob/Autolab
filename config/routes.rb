@@ -26,7 +26,9 @@ Autolab3::Application.routes.draw do
   end
 
   resources :courses, param: :name do
-    resources :sections
+    resource :sections do
+      get "demo"
+    end
     resources :schedulers
     resources :jobs, only: :index do
       get "getjob", on: :member

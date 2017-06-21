@@ -1,4 +1,8 @@
-<h4>Found <span id="results-count"><%=  %> 1</span> sections</h4>
+
+
+
+
+<h4>Found <span id="results-count"><%=  Sections.where("course_id = ?", @course.id).count%></span> sections</h4>
 <table class="prettyBorder sortable" >
 <thead>
   <tr>
@@ -6,21 +10,15 @@
     <th>Name</th>
     <th>Start Time</th>
     <th>End Time</th>
-    <th># of students</th>
-    <th>TA</th>
   </tr>
 </thead>
 <!-- Row index is set using CSS. -->
-<% CourseUserDatum.group("lecture").where("course_id = ? AND lecture != ''", @course.id).each do |cud| %>
+<% Sections.where("course_id = ?", @course.id).each do |sec| %>
 <tr class="user-row">
   <td class="row-index"></td>
-<!--   <td><%= cud.lecture %></td>
-  <td><%= cud.section %></td> -->
-  <td>A1</td>
-  <td>12:00pm</td>
-  <td>12:50pm</td>
-  <td>25</td>
-  <td>Bob Test</td>
+  <td><%= sec.name %></td>
+  <td><%= sec.start.strftime("%A %H:%M") %></td>
+  <td><%= sec.end.strftime("%A %H:%M") %></td>
 </tr>
 <% end %>
 </table>
