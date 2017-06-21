@@ -1,5 +1,4 @@
 Autolab3::Application.routes.draw do
-  get 'sections/index'
 
   root "courses#index"
 
@@ -27,6 +26,7 @@ Autolab3::Application.routes.draw do
   end
 
   resources :courses, param: :name do
+    resources :sections
     resources :schedulers
     resources :jobs, only: :index do
       get "getjob", on: :member
