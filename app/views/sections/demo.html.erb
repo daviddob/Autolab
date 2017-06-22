@@ -2,15 +2,40 @@
   <%= javascript_include_tag "initialize_datetimepickers" %>
 <% end %>
 
-<%= form_for @course ,builder: FormBuilderWithDateTimeInput do |f| %>
-<%= f.date_select :start_at,
-  style: "margin-top: 0 !important;",
-  help_text: "The time this assessment is released to students."
- %>
-<% end %>
+
+<br>
+<h6>base day:</h6><br>
+<p id = "start"></p>
+<hr>
+<h6>lab time (date is ignored just need the time):</h6><br>
+<p id="labstart"></p>
+<hr>
+<h6>due time:</h6><br>
+<p id="dump"></p>
 
 <script type="text/javascript">
-	document.getElementById("course_start_at").value = "June 21, 2017"
+	var dayinmilli = 86400000;
+	var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+	var start = new Date("2017-06-21 20:36:48");
+	var stuff = '<%= raw Sections.where("course_id = ?", @course.id).to_json %>';
+	var labDate = new Date(JSON.parse(stuff)[0].start);
+
+	start.setHours(0,0,0)
+	document.getElementById("start").innerHTML = start;
+	document.getElementById("labstart").innerHTML = labDate;
+
+
+	var temp = new Date(start);
+	temp.setHours(0);
+	temp.setMinutes(0);
+	temp.setSeconds(0);
+	while(labDate.getDay() != temp.getDay()){
+		var temp = new Date(temp.getTime() + dayinmilli);
+	}
+	temp.setHours(labDate.getHours(), labDate.getMinutes(),labDate.getSeconds());
+	document.getElementById("dump").innerHTML = temp;
+
+
 </script>
 
 
