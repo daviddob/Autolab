@@ -6,50 +6,72 @@
 <%= form_for @course ,builder: FormBuilderWithDateTimeInput do |f| %>
 <%=f.date_select :start_at,
   style: "margin-top: 0 !important;",
-  help_text: "The time this assessment is released to students."
+  help_text: "Please pick a day during the week that you wish this assignement to be scaled around (please note weeks start on sunday)."
  %>
 <% end %>
 
 <br>
-<h6>base day:</h6><br>
-<p id = "start"></p>
-<hr>
 <h6>lab time (date is ignored just need the time):</h6><br>
+ <%= form_for :sections , :as=>"section" do |f| %>
+        <%= f.select( :name ,Sections.where("course_id = ?", @course.id).collect{|r| [ r.name]}, {prompt: 'select section'}, {class: 'select_menu'}) %>
+<% end %>
+<hr>
+<h6>lab start time:</h6><br>
 <p id="labstart"></p>
 <hr>
 <h6>due time:</h6><br>
 <p id="dump"></p>
+<hr>
 
 <script type="text/javascript">
-	var dayinmilli = 86400000;
-	var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-	document.getElementById("course_start_at").value = new Date();
+document.getElementById("course_start_at").setAttribute("onchange", "go()");
+document.getElementById("course_start_at").value = new Date();
+var stuff = JSON.parse('<%= raw Sections.where("course_id = ?", @course.id).to_json %>');
+var value = "";
+var dayinmilli = 86400000;
+var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
 
+$(".select_menu").change(function(){          
 
+    value =  $("#" + this.id).val();
+    go();
+});
 
-	var start = new Date("2017-06-21 20:36:48");
-
-
-	var stuff = '<%= raw Sections.where("course_id = ?", @course.id).to_json %>';
-	var labDate = new Date(JSON.parse(stuff)[0].start);
-
+function go(){
+	//deal with what date the user picks
+	var start = new Date(document.getElementById("course_start_at").value);
 	start.setHours(0,0,0)
-	document.getElementById("start").innerHTML = start;
-	document.getElementById("labstart").innerHTML = labDate;
-
-
-	var temp = new Date(start);
-	temp.setHours(0);
-	temp.setMinutes(0);
-	temp.setSeconds(0);
-	while(labDate.getDay() != temp.getDay()){
-		var temp = new Date(temp.getTime() + dayinmilli);
+	var temps = new Date(start);
+	while(temps.getDay() != 0){
+		temps = new Date(temps.getTime() - dayinmilli);
 	}
-	temp.setHours(labDate.getHours(), labDate.getMinutes(),labDate.getSeconds());
-	document.getElementById("dump").innerHTML = temp;
+
+	//deal with what sections user picks
+	for (i = 0; i < stuff.length; i++) {
+		if(stuff[i].name == value){
+			var labDate = new Date(stuff[i].start);
+			document.getElementById("labstart").innerHTML = labDate;
 
 
+			var temp = new Date(start);
+			temp.setHours(0,0,0);
+
+			if(labDate.getDay() == temp.getDay()){
+				temp = new Date(temp.getTime() + dayinmilli);
+			}
+
+			while(labDate.getDay() != temp.getDay()){
+				temp = new Date(temp.getTime() + dayinmilli);
+			}
+			temp.setHours(labDate.getHours(), labDate.getMinutes(),labDate.getSeconds());
+			document.getElementById("dump").innerHTML = temp;
+			break;
+		}
+	}
+
+
+	
+}
+go();
 </script>
-
-
