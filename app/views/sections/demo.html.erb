@@ -3,6 +3,13 @@
 <% end %>
 
 
+<%= form_for @course ,builder: FormBuilderWithDateTimeInput do |f| %>
+<%=f.date_select :start_at,
+  style: "margin-top: 0 !important;",
+  help_text: "The time this assessment is released to students."
+ %>
+<% end %>
+
 <br>
 <h6>base day:</h6><br>
 <p id = "start"></p>
@@ -16,7 +23,14 @@
 <script type="text/javascript">
 	var dayinmilli = 86400000;
 	var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+	document.getElementById("course_start_at").value = new Date();
+
+
+
+
 	var start = new Date("2017-06-21 20:36:48");
+
+
 	var stuff = '<%= raw Sections.where("course_id = ?", @course.id).to_json %>';
 	var labDate = new Date(JSON.parse(stuff)[0].start);
 
