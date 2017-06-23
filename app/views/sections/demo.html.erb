@@ -16,6 +16,9 @@
         <%= f.select( :name ,Sections.where("course_id = ?", @course.id).collect{|r| [ r.name]}, {prompt: 'select section'}, {class: 'select_menu'}) %>
 <% end %>
 <hr>
+<input name="sameDay" id="sameDay" type="checkbox">
+<label for="sameDay">start the assignement today for any sections occuring on the start day</label>
+<hr>
 <h6>lab start time:</h6><br>
 <p id="labstart"></p>
 <hr>
@@ -26,8 +29,10 @@
 <script type="text/javascript">
 document.getElementById("course_start_at").setAttribute("onchange", "go()");
 document.getElementById("course_start_at").value = new Date();
+document.getElementById("sameDay").checked = false;
 var stuff = JSON.parse('<%= raw Sections.where("course_id = ?", @course.id).to_json %>');
 var value = "";
+var sameday = 0;
 var dayinmilli = 86400000;
 var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
@@ -36,6 +41,11 @@ $(".select_menu").change(function(){
 
     value =  $("#" + this.id).val();
     go();
+});
+
+$("#sameDay").change(function(){
+	sameday = this.checked;
+	go();
 });
 
 function go(){
@@ -57,7 +67,7 @@ function go(){
 			var temp = new Date(start);
 			temp.setHours(0,0,0);
 
-			if(labDate.getDay() == temp.getDay()){
+			if(labDate.getDay() == temp.getDay() && !sameday){
 				temp = new Date(temp.getTime() + dayinmilli);
 			}
 
