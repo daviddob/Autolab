@@ -19,6 +19,20 @@
         defaultDate: moment($(dateElts[i]).val()).format("MMMM D YYYY")
       })
     }
+
+
+    var timeElements = $('.timepicker');
+      for (var i = 0; i < timeElements.length; i++) {
+        $(timeElements[i]).flatpickr({
+          enableTime: true,
+          noCalendar: true,
+          enableSeconds: false,
+          time_24hr: true, 
+          defaultHour: 12,
+          defaultMinute: 0,
+          defaultDate: "12:00"
+        });
+      }
   });
 
 })();

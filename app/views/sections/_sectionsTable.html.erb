@@ -1,25 +1,20 @@
-
-
-
-
 <h4>Found <span id="results-count"><%=  Sections.where("course_id = ?", @course.id).count%></span> sections</h4>
 <table class="prettyBorder sortable" >
-<thead>
-  <tr>
-    <th>&#8470;</th><!-- "No." symbol. -->
-    <th>Name</th>
-    <th>Start Time</th>
-    <th>End Time</th>
+  <thead>
+    <tr>
+      <th>&#8470;</th><!-- "No." symbol. -->
+      <th>Name</th>
+      <th>Start Time</th>
+      <th>End Time</th>
+    </tr>
+  </thead>
+  <!-- Row index is set using CSS. -->
+  <% Sections.where("course_id = ?", @course.id).each do |sec| %>
+  <tr class="user-row">
+    <td class="row-index"></td>
+    <td><%= sec.name %></td>
+    <td><%= sec.start.strftime("%A %H:%M") %></td>
+    <td><%= sec.end.strftime("%A %H:%M") %></td>
   </tr>
-</thead>
-<!-- Row index is set using CSS. -->
-<% Sections.where("course_id = ?", @course.id).each do |sec| %>
-<tr class="user-row">
-  <td class="row-index"></td>
-  <td><%= sec.name %></td>
-  <td><%= sec.start.strftime("%A %H:%M") %></td>
-  <td><%= sec.end.strftime("%A %H:%M") %></td>
-</tr>
-<% end %>
+  <% end %>
 </table>
-

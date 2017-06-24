@@ -80,6 +80,14 @@ class FormBuilderWithDateTimeInput < ActionView::Helpers::FormBuilder
     date_helper name, options, strftime, date_format, alt_format
   end
 
+   def time_selecter(name, options = {}, _html_options = {})
+    strftime = "%H:%M"
+    date_format = "h:i"
+    alt_format = "h:i"
+    options[:picker_class] = "timepicker"
+    date_helper name, options, strftime, date_format, alt_format
+  end
+
 private
 
   # Pass space-delimited list of IDs of datepickers on the :less_than and

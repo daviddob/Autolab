@@ -12,7 +12,7 @@ class SectionsController < ApplicationController
       flash[:error] = "Permission denied."
       redirect_to(root_path) && return
     end
-
+    abort params.inspect
     @new_section = Section.new(new_section_params)
 	end
 
