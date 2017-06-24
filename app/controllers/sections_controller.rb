@@ -4,15 +4,16 @@ class SectionsController < ApplicationController
   def index
   end
 
-  action_auth_level :show, :student
+  action_auth_level :show, :instructor
   def show
+  	
   end
 
    def create
     # check for permission
     unless current_user.administrator?
       flash[:error] = "Permission denied."
-      redirect_to(course_sections_path) && return
+      redirect_to(course_assessments_path) && return
     end
     data = params["sections"]
     if(Sections.where("course_id = ? && name = ?", @course.id, data["name"]).exists?)
