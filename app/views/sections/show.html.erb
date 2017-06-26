@@ -39,21 +39,46 @@
 				<%= form_for :sections, url: course_sections_path, builder: FormBuilderWithDateTimeInput do |f| %>
 				<%= f.text_field "name", id: "section_name" %>
 				<br>
+				<div id="wrap">
 				<%= f.select(:day, [["Monday",1],["Tuesday",2],["Wednesday",3],["Thursday",4],["Friday",5],["Saturday",6],["Sunday",0]] ,{prompt: 'Select Day Of Week'}, {id: 'sections_day'}) %>
+				</div>
 				<br>
 				<%= f.time_selecter "start time", id: "section_start_at" %>
 				<br>
 				<%= f.time_selecter "end time", id: "section_end_at" %>
 				<br>
 				<%= f.submit "Save" , {:class=>"btn primary"} %>
+				<%= f.submit "Delete" , {:class=>"btn primary"} %>
 				<%end%>
 			</div>
 		</div>
 	</div>
 
 
-<script type="text/javascript">
+	<script type="text/javascript">
 	//initalize forms with default data
 	document.getElementById("sections_day").value = "";
 	document.getElementById("section_name").value = "";
+	$('td').click(function(){
+		data = this.parentElement.children;
+		day = data[2].innerHTML.split(" ")[0]
+		document.getElementById("section_name").value = data[1].innerHTML;
+
+		$('#sections_day').val({
+			Sunday: 0,
+			Monday: 1,
+			Tuesday: 2,
+			Wednesday: 3,
+			Thursday: 4,
+			Friday: 5,
+			Saturday: 6
+		}[day]);
+
+		document.getElementById("sections_start time").value = data[2].innerHTML.split(" ")[1];
+		document.getElementById("sections_end time").value = data[3].innerHTML.split(" ")[1];
+
+
+		Materialize.updateTextFields();
+		$('#sections_day').material_select();
+	});
 </script>
