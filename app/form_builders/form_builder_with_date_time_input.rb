@@ -82,8 +82,8 @@ class FormBuilderWithDateTimeInput < ActionView::Helpers::FormBuilder
 
    def time_selecter(name, options = {}, _html_options = {})
     strftime = "%H:%M"
-    date_format = "h:i"
-    alt_format = "h:i"
+    date_format = "H:i"
+    alt_format = "H:i"
     options[:picker_class] = "timepicker"
     date_helper name, options, strftime, date_format, alt_format
   end

@@ -17,6 +17,18 @@ class SectionsController < ApplicationController
     end
 
     data = params["sections"]
+
+    # basic data verifcation
+    if data['name'] == ""
+    	flash[:error] = "please provide a valid name"
+    	redirect_to(course_sections_path) && return
+    end
+    if data['day'] == ""
+    	flash[:error] = "please provide a valid day"
+    	redirect_to(course_sections_path) && return
+    end
+
+
     # see if we want to delete the record
   	if(params["commit"] == "Delete")
   		delete
@@ -31,6 +43,7 @@ class SectionsController < ApplicationController
     end
 
     # we must want to create one then so do it
+
     @new_section = Sections.new
     @new_section.name = data["name"]
     @new_section.course_id = @course.id
