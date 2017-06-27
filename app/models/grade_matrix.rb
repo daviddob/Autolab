@@ -87,6 +87,7 @@ private
     asmt_before_grading_deadline = {}
 
     @course.assessments.each do |a|
+      a.deal_with_section
       asmt_before_grading_deadline["#{a.id}"] = a.before_grading_deadline?
     end
 

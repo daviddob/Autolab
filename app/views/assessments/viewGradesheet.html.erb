@@ -1,2 +1,4 @@
 <% @title = "View Gradesheet" %>
+  <% @assessment.deal_with_section %>
 <%= render :partial=>"gradesheet", :locals => { :students => @students }, :layout => false %>
+

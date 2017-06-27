@@ -1,6 +1,7 @@
 <% content_for :javascripts do %>
   <%= javascript_include_tag "assessments_show" %>
   <%= javascript_include_tag 'validateIntegrity.js' %>
+  <% @assessment.deal_with_section %>
 <% end %>
 
 <%# Make sure these options are not on the general user options list.  %>
@@ -144,7 +145,7 @@
         </p>
 
         <p class="valign-wrapper">
-          <i class="valign material-icons">today</i>&nbsp;&nbsp;Last day to handin:&nbsp;&nbsp;<b><span class="moment-date-time"> <%= end_at_display(@aud.end_at false) %></span></b>
+          <i class="valign material-icons">today</i>&nbsp;&nbsp;Last day to handin:&nbsp;&nbsp;<b><span class="moment-date-time"><%=  end_at_display(@aud.end_at false) %></span></b>
 
         </p>
 

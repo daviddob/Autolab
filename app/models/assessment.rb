@@ -50,6 +50,7 @@ class Assessment < ActiveRecord::Base
   scope :ordered, -> { order(ORDERING) }
   scope :released, ->(as_of = Time.now) { where(RELEASED, as_of) }
   scope :unreleased, ->(as_of = Time.now) { where.not(RELEASED, as_of) }
+  
 
   # Misc.
   accepts_nested_attributes_for :late_penalty, :version_penalty, allow_destroy: true
@@ -105,6 +106,10 @@ class Assessment < ActiveRecord::Base
 
   def handin_directory_path
     path handin_directory
+  end
+
+  def deal_with_section
+    self.due_at = Sections.where("id = 4").first.end
   end
 
   def writeup_path
