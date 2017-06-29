@@ -27,8 +27,10 @@ Autolab3::Application.routes.draw do
 
   resources :courses, param: :name do
     resource :sections do
+      resource :sectionuserdata
       get "demo"
     end
+
     resources :schedulers
     resources :jobs, only: :index do
       get "getjob", on: :member
