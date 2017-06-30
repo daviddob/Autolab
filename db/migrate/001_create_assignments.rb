@@ -20,5 +20,6 @@ class CreateAssignments < ActiveRecord::Migration
     add_column :assessments, :base_section_day, :date, default: nil
     add_column :assessments, :start_offset, :integer, default: 0
     add_column :assessments, :end_offset, :integer, default: 0
+    add_column :assessments, :on_day, :boolean, default: false
   end
 end
