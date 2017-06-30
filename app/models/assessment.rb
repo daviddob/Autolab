@@ -112,6 +112,23 @@ class Assessment < ActiveRecord::Base
     self.due_at = Sections.where("id = 4").first.end
   end
 
+  def deal_with_section_for_user(user)
+    day_array = {"Sunday" => 0,"Monday" => 1,"Tuesday" => 2,"Wensday" => 3,"Thursday" => 4,"Friday" => 5,"Saturday" => 6}
+    section = Sections.where("name = ? AND course_id = ?", user.section, user.course_id).first
+    if(section.nil?)
+      return
+    end
+    if(!self.base_section_day.nil?)
+    temp = ((self.base_section_day-day_array[self.base_section_day.strftime("%A")]) + day_array[section.end.strftime("%A")]).to_time
+    temp = temp + section.end.to_time.hour * 60 *60
+    temp = temp + section.end.to_time.min * 60
+    # abort temp.strftime("%Y-%m-%d %X").inspect
+    self.due_at = temp.strftime("%Y-%m-%d %X")
+  end
+
+
+  end
+
   def writeup_path
     path writeup
   end
