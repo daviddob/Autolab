@@ -13,7 +13,7 @@ help_text: "Please pick a day during the week that you wish this assignement to 
 <br>
 
 <input name="sameDay" id="sameDay" type="checkbox">
-<label for="sameDay">start the assignement today for any sections occuring on the start day</label>
+<label for="sameDay">start the assignment on the sunday that starts this week</label>
 
 <hr>
 <div>
@@ -85,7 +85,6 @@ help_text: "Please pick a day during the week that you wish this assignement to 
 	while(temps.getDay() != 0){
 		temps = new Date(temps.getTime() - dayinmilli);
 	}
-
 	//deal with what sections user picks
 	for (i = 0; i < stuff.length; i++) {
 
@@ -94,10 +93,10 @@ help_text: "Please pick a day during the week that you wish this assignement to 
 			// document.getElementById("labstart").innerHTML = labDate;
 
 
-			var temp = new Date(start);
+			var temp = new Date(temps);
 			temp.setHours(0,0,0);
 
-			var tempEnd = new Date(start);
+			var tempEnd = new Date(temps);
 			tempEnd.setHours(0,0,0);
 
 			if(labDate.getDay() == temp.getDay() && !sameday){
