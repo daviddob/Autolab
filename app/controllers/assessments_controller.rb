@@ -389,6 +389,9 @@ class AssessmentsController < ApplicationController
 
   action_auth_level :show, :student
   def show
+    if !@assessment.is_released_for_this_user?(@cud) 
+      redirect_to course_assessments_path 
+    end
     set_handin
     extend_config_module(@assessment, @submission, @cud)
 

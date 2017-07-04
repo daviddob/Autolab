@@ -124,9 +124,24 @@ class Assessment < ActiveRecord::Base
     temp = temp + section.end.to_time.min * 60
     # abort temp.strftime("%Y-%m-%d %X").inspect
     self.due_at = temp.strftime("%Y-%m-%d %X")
+
+
+    temps = ((self.base_section_day-day_array[self.base_section_day.strftime("%A")]) + day_array[section.start.strftime("%A")]).to_time
+    temps = temps + section.start.to_time.hour * 60 *60
+    temps = temps + section.start.to_time.min * 60
+    # abort temps.strftime("%Y-%m-%d %X").inspect
+    self.start_at = temps.strftime("%Y-%m-%d %X")
+   end
+
   end
 
-
+  def is_released_for_this_user?(user)
+    deal_with_section_for_user(user)
+    if user.student?
+      self.released?
+    else
+      true
+    end
   end
 
   def writeup_path
@@ -200,7 +215,7 @@ class Assessment < ActiveRecord::Base
   def construct_folder
     # this should construct the assessment folder and the handin folder
     FileUtils.mkdir_p(handin_directory_path)
-    dump_yaml if construct_default_config_file
+    dump_yaml if construct_default_config_filere
   end
 
   ##

@@ -156,11 +156,6 @@ class AssessmentUserDatum < ActiveRecord::Base
     end # release lock
   end
 
-  def start_at
-
-  end
-
-
   # Due date for user
   # If there is an infinite extension, then due_at is nil.
   def due_at

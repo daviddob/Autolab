@@ -32,15 +32,13 @@
 
             <div class="collection blue darken-3">
               <% asmts.each do |asmt| %>
+              <% asmt.deal_with_section_for_user(@cud) %> 
+              <% if asmt.released? %>
                 <div class="collection-item">
                   <%= link_to asmt.display_name, course_assessment_url(@course, asmt),
                               {:class => "grey-text text-darken-3"} %>
-                  <% if !asmt.released? %>
-                    <a href="<%= edit_course_assessment_url(@course, asmt) %>/handin">
-                      <span class="new badge blue darken-3" data-badge-caption="unreleased"></span>
-                    </a>
-                  <% end %>
                 </div>
+              <% end %>
               <% end %>
             </div>
 
