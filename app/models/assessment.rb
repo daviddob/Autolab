@@ -113,13 +113,13 @@ class Assessment < ActiveRecord::Base
   end
 
   def deal_with_section_for_user(user)
-    day_array = {"Sunday" => 0,"Monday" => 1,"Tuesday" => 2,"Wensday" => 3,"Thursday" => 4,"Friday" => 5,"Saturday" => 6}
+    day_array = {"Sunday" => 0,"Monday" => 1,"Tuesday" => 2,"Wensday" => 3,"Thursday" => 4,"Friday" => 5,"Saturday" => 6, "nextWeek" => 7}
     section = Sections.where("name = ? AND course_id = ?", user.section, user.course_id).first
     if(section.nil?)
       return
     end
     if(!self.base_section_day.nil?)
-    temp = ((self.base_section_day-day_array[self.base_section_day.strftime("%A")]) + day_array[section.end.strftime("%A")]).to_time
+    temp = ((self.base_section_day-day_array[self.base_section_day.strftime("%A")]) + day_array[(self.on_day?) ? section.end.strftime("%A") : "nextWeek" ]).to_time
     temp = temp + section.end.to_time.hour * 60 *60
     temp = temp + section.end.to_time.min * 60
     temp = temp - self.end_offset * 60
@@ -127,7 +127,7 @@ class Assessment < ActiveRecord::Base
     self.due_at = temp.strftime("%Y-%m-%d %X")
 
 
-    temps = ((self.base_section_day-day_array[self.base_section_day.strftime("%A")]) + day_array[section.start.strftime("%A")]).to_time
+    temps = ((self.base_section_day-day_array[self.base_section_day.strftime("%A")]) + day_array[(self.on_day?) ? section.start.strftime("%A") : "nextWeek"]).to_time
     temps = temps + section.start.to_time.hour * 60 *60
     temps = temps + section.start.to_time.min * 60
     temps = temps + self.start_offset * 60 
