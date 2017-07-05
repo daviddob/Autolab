@@ -122,6 +122,7 @@ class Assessment < ActiveRecord::Base
     temp = ((self.base_section_day-day_array[self.base_section_day.strftime("%A")]) + day_array[section.end.strftime("%A")]).to_time
     temp = temp + section.end.to_time.hour * 60 *60
     temp = temp + section.end.to_time.min * 60
+    temp = temp - self.end_offset * 60
     # abort temp.strftime("%Y-%m-%d %X").inspect
     self.due_at = temp.strftime("%Y-%m-%d %X")
 
@@ -129,6 +130,7 @@ class Assessment < ActiveRecord::Base
     temps = ((self.base_section_day-day_array[self.base_section_day.strftime("%A")]) + day_array[section.start.strftime("%A")]).to_time
     temps = temps + section.start.to_time.hour * 60 *60
     temps = temps + section.start.to_time.min * 60
+    temps = temps + self.start_offset * 60 
     # abort temps.strftime("%Y-%m-%d %X").inspect
     self.start_at = temps.strftime("%Y-%m-%d %X")
    end
