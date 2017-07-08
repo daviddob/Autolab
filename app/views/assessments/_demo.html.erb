@@ -17,12 +17,12 @@ help_text: "Please pick a day during the week that you wish this assignement to 
 
 <hr>
 <div>
-<label for="startoffset">How far into the section should the assignement start</label>
+<label for="startoffset">Offset in minutes into the section should the assignement start</label>
 <%= number_field_tag "startoffset",nil, :value => 0%>
 </div>
 <br>
 <div>
-<label for="endoffset">How far before the section ends should the assignement end</label>
+<label for="endoffset">Offset in minutes before the section ends should the assignement end</label>
 <%= number_field_tag "endoffset",nil, :value => 0%>
 </div>
 
@@ -51,10 +51,10 @@ help_text: "Please pick a day during the week that you wish this assignement to 
 
 <script type="text/javascript">
 	document.getElementById("course_start_at").setAttribute("onchange", "go()");
-	document.getElementById("course_start_at").value = new Date();
-	document.getElementById("sameDay").checked = false;
-	document.getElementById("startoffset").value = 0;
-	document.getElementById("endoffset").value = 0;
+	document.getElementById("course_start_at").value = new Date(<%= @assessment.base_section_day.to_time.to_i %> * 1000);
+	document.getElementById("sameDay").checked = <%= @assessment.on_day %>;
+	document.getElementById("startoffset").value = <%= @assessment.start_offset %>;
+	document.getElementById("endoffset").value = <%= @assessment.end_offset %>;
 	var stuff = JSON.parse('<%= raw Sections.where("course_id = ?", @course.id).to_json %>');
 	var value = "";
 	var sameday = 0;

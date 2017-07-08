@@ -29,6 +29,11 @@
       <p>or</p>
       <%= text_field_tag :new_category, nil, placeholder: "New Category" %>
       <p class="help-block">Select an existing category or enter a new category name <i>(you can always change it later)</i></p>
+  
+      <br>
+      <input name="sectionDependant" id="sectionDependant" type="checkbox">
+      <label for="sectionDependant">Make this assessment section based?</label>
+      <br>
     </div>
 
     <div class="embedded-form" style="margin-top: 2rem;">
@@ -61,6 +66,7 @@
     <hr>
 
     <h4>Optional Modules Used</h4>
+
 
     <span class="checkbox"><%= f.check_box :has_svn,
       display_name: "Use SVN?",

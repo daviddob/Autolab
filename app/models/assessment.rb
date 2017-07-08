@@ -108,9 +108,7 @@ class Assessment < ActiveRecord::Base
     path handin_directory
   end
 
-  def deal_with_section
-    self.due_at = Sections.where("id = 4").first.end
-  end
+  # section code
 
   def deal_with_section_for_user(user)
     day_array = {"Sunday" => 0,"Monday" => 1,"Tuesday" => 2,"Wensday" => 3,"Thursday" => 4,"Friday" => 5,"Saturday" => 6, "nextWeek" => 7}
@@ -128,7 +126,7 @@ class Assessment < ActiveRecord::Base
 
 
     temps = ((self.base_section_day-day_array[self.base_section_day.strftime("%A")]) + day_array[(self.on_day?) ? section.start.strftime("%A") : "nextWeek"]).to_time
-    temps = temps + section.start.to_time.hour * 60 *60
+    temps = temps + section.start.to_time.hour * 60 * 60
     temps = temps + section.start.to_time.min * 60
     temps = temps + self.start_offset * 60 
     # abort temps.strftime("%Y-%m-%d %X").inspect
@@ -146,6 +144,11 @@ class Assessment < ActiveRecord::Base
     end
   end
 
+  def is_section_dependant()
+    !self.base_section_day.nil?
+  end
+
+# end section code
   def writeup_path
     path writeup
   end

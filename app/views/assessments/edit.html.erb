@@ -34,7 +34,7 @@
 </ul>
 
 <div class="row">
-  <div class="col-md-6">
+  <div class="col-md-8">
     <%= form_for [ @course, @assessment ], url: edit_course_assessment_path(@course, @assessment) + "/#{params[:active_tab]}", builder: FormBuilderWithDateTimeInput do |f| %>
       <% if @course.errors.any? %>
           <ul>
@@ -51,12 +51,21 @@
             <% end %>
           </ul>
       <% end %>
+
       <div id="tab_basic">
         <%= render "edit_basic", f: f %>
       </div>
-      <div id="tab_handin">
-        <%= render "edit_handin", f: f %>
-      </div>
+      <% if @assessment.is_section_dependant %>
+        <div id="tab_handin">
+            <%= render "edit_handin_section", f: f %>
+        </div>
+      <% else %>
+
+        <div id="tab_handin">
+          <%= render "edit_handin", f: f %>
+        </div>
+
+      <% end %>
       <div id="tab_penalties">
         <%= render "edit_penalties", f: f %>
       </div>
