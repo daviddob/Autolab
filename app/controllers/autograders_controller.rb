@@ -54,7 +54,7 @@ class AutogradersController < ApplicationController
 private
 
   def set_assessment_breadcrumb
-    @breadcrumbs << (view_context.link_to "Edited Assessment", [:edit, @course, @assessment])
+    @breadcrumbs << (view_context.link_to "Edit Assessment", [:edit, @course, @assessment])
   end
 
   def set_autograder
