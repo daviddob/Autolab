@@ -28,7 +28,7 @@ class AutogradersController < ApplicationController
 		upload
     redirect_to([:edit, @course, @assessment, :autograder]) && return
   end
-	
+
   action_auth_level :destroy, :instructor
   def destroy
     flash[:info] = "Destroyed!" if @autograder.destroy
@@ -42,9 +42,9 @@ class AutogradersController < ApplicationController
 	  if not uploaded_makefile.nil?
 		  File.open(Rails.root.join('courses', @course.name, @assessment.name, 'autograde-Makefile'), 'wb') do |file|
 		  file.write(uploaded_makefile.read) unless uploaded_makefile.nil?
-		end	
+		end
 	  end
-	  if not uploaded_tar.nil?	
+	  if not uploaded_tar.nil?
 		  File.open(Rails.root.join('courses', @course.name, @assessment.name, 'autograde.tar'), 'wb') do |file|
 		  file.write(uploaded_tar.read) unless uploaded_tar.nil?
 		 end
@@ -54,7 +54,7 @@ class AutogradersController < ApplicationController
 private
 
   def set_assessment_breadcrumb
-    @breadcrumbs << (view_context.link_to "Edit Assessment", [:edit, @course, @assessment])
+    @breadcrumbs << (view_context.link_to "Edited Assessment", [:edit, @course, @assessment])
   end
 
   def set_autograder
