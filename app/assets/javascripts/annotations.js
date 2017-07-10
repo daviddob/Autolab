@@ -24,7 +24,7 @@ var initializeAnnotationsForCode = function() {
   var block = document.getElementById('code-block');
   hljs.highlightBlock(block);
 
-  // annotationsByLine: { 'lineNumber': [annotations_array ]}
+  // annotationsByLine: { 'lineNumber': [annotations_array ]}  ,,Just Testing,,
   annotationsByLine = {};
   _.each(annotations, function(annotationObj, ind) {
     var lineInd = annotationObj.line
@@ -352,12 +352,12 @@ var initializeAnnotationsForCode = function() {
     }, elt("option", {
       value: ""
     }, "None"));
-    
+
     var rowDiv1 = elt("div", {
       class: "row",
       style: "margin-left:4px;"
     }, commentInput);
-    
+
     var rowDiv2 = elt("div", {
       class: "row",
       style: "margin-left:4px; width: 100%;"
@@ -380,7 +380,7 @@ var initializeAnnotationsForCode = function() {
       problemSelect.appendChild(elt("option", {
         value: problem.id
       }, problem.name));
-    }) 
+    })
 
     var newForm = elt("form", {
       title: "Press <Enter> to Submit",
@@ -559,7 +559,7 @@ var showAnnotationFormAtCoord = function(pageInd, x, y) {
 
 
 var submitNewPDFAnnotation = function(comment, value, problem_id, pageInd, xRatio, yRatio, widthRatio, heightRatio, newForm) {
-  
+
   var newAnnotation = createAnnotation();
   newAnnotation.coordinate = [xRatio, yRatio, pageInd, widthRatio, heightRatio].join(',');
   newAnnotation.comment = comment;
@@ -650,7 +650,7 @@ var submitNewAnnotation = function(comment, value, problem_id, lineInd, formEl) 
   }
 
 var makeAnnotationMovable = function(annotationEl, annotationObj) {
-    
+
     var positionArr = annotationObj.coordinate.split(',');
 
     var curPageInd  = positionArr[2];
@@ -669,7 +669,7 @@ var makeAnnotationMovable = function(annotationEl, annotationObj) {
         updateAnnotation(annotationObj, null, null);
       }
     });
-    
+
     $(annotationEl).resizable({
       stop: function( event, ui ) {
         var widthRatio = ui.size.width / $page.attr('width');
@@ -719,5 +719,3 @@ var initializeAnnotationsForPDF = function() {
   });
 
 }
-
-
