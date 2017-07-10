@@ -21,5 +21,6 @@ class CreateAssignments < ActiveRecord::Migration
     add_column :assessments, :start_offset, :integer, default: 0
     add_column :assessments, :end_offset, :integer, default: 0
     add_column :assessments, :on_day, :boolean, default: false
+    add_column :assessments, :lecture, :boolean, default: false
   end
 end

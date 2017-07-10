@@ -111,8 +111,8 @@ class Assessment < ActiveRecord::Base
   # section code
 
   def deal_with_section_for_user(user)
-    day_array = {"Sunday" => 0,"Monday" => 1,"Tuesday" => 2,"Wensday" => 3,"Thursday" => 4,"Friday" => 5,"Saturday" => 6, "nextWeek" => 7}
-    section = Sections.where("name = ? AND course_id = ?", user.section, user.course_id).first
+    day_array = {"Sunday" => 0,"Monday" => 1,"Tuesday" => 2,"Wednesday" => 3,"Thursday" => 4,"Friday" => 5,"Saturday" => 6, "nextWeek" => 7}
+    section = Sections.where("name = ? AND course_id = ?", self.lecture? ? user.lecture : user.section, user.course_id).first
     if(section.nil?)
       return
     end

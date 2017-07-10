@@ -543,6 +543,7 @@ class AssessmentsController < ApplicationController
     edit_assessment_params["start_offset"] = params["startoffset"]
     edit_assessment_params["end_offset"] = params["endoffset"]
     edit_assessment_params["on_day"] = params["sameDay"].nil? ? 0 : 1
+    edit_assessment_params["lecture"] = params["lecture"].nil? ? 0 : 1
   end
 
     flash[:success] = "Saved!" if @assessment.update!(edit_assessment_params)

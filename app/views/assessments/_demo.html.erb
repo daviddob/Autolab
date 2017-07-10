@@ -14,6 +14,9 @@ help_text: "Please pick a day during the week that you wish this assignement to 
 
 <input name="sameDay" id="sameDay" type="checkbox">
 <label for="sameDay">start the assignment on the sunday that starts this week</label>
+<br>
+<input name="lecture" id="lecture" type="checkbox">
+<label for="lecture">use the sudents assigned lecture? if this is not checked it will use the assigned section.</label>
 
 <hr>
 <div>
@@ -53,6 +56,7 @@ help_text: "Please pick a day during the week that you wish this assignement to 
 	document.getElementById("course_start_at").setAttribute("onchange", "go()");
 	document.getElementById("course_start_at").value = new Date(<%= @assessment.base_section_day.to_time.to_i %> * 1000);
 	document.getElementById("sameDay").checked = <%= @assessment.on_day %>;
+	document.getElementById("lecture").checked = <%= @assessment.lecture %>;
 	document.getElementById("startoffset").value = <%= @assessment.start_offset %>;
 	document.getElementById("endoffset").value = <%= @assessment.end_offset %>;
 	var stuff = JSON.parse('<%= raw Sections.where("course_id = ?", @course.id).to_json %>');
