@@ -77,7 +77,15 @@ class SectionsController < ApplicationController
 	end
 
   def editusers
-    render :json => { :success => true, :data => params}
+    user = CourseUserDatum.find(params['id'])
+
+    if params['lecture']
+      user.lecture = params["sectionName"] 
+    else
+      user.section = params["sectionName"]
+    end
+    user.save
+    render :json => { :success => true}
   end
 
 end
