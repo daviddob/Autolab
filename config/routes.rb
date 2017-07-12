@@ -28,6 +28,7 @@ Autolab3::Application.routes.draw do
   resources :courses, param: :name do
     resource :sections do
       get "users"
+      post "editusers"
     end
     resources :schedulers
     resources :jobs, only: :index do

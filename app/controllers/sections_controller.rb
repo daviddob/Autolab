@@ -76,4 +76,8 @@ class SectionsController < ApplicationController
     	redirect_to(course_sections_path) && return
 	end
 
+  def editusers
+    render :json => { :success => true, :data => params}
+  end
+
 end

@@ -1,0 +1,37 @@
+<table class="prettyBorder sortable" >
+	<thead>
+		<tr>
+			<th>&#8470;</th><!-- "No." symbol. -->
+			<th>Email</th>
+			<th>Lecture</th>
+			<th>Section</th>
+		</tr>
+	</thead>
+	<!-- Row index is set using CSS. -->
+	<% CourseUserDatum.where("course_id = ?", @course.id).each do |cu| %>
+	<tr class="user-row">
+		<td class="row-index"></td>
+		<td id="<%= cu.email %>"><%= cu.email %></td>
+		<td id="<%= cu.email %>_start"><%=cu.lecture%></td>
+		<td id="<%= cu.email %>_end"><%=cu.section%></td>
+	</tr>
+	<% end %>
+</table>
+
+
+<script>
+$.ajax({
+     type: "POST",
+     contentType: "application/json; charset=utf-8",
+     url: "editusers",
+     data : JSON.stringify({name:"ravi",age:"31"}),
+     dataType: "json",
+     success: function (result) {
+        // alert(result["data"]["age"]);
+        window.alert("success!!");
+     },
+     error: function (){
+        window.alert("something wrong!");
+     }
+});
+</script>
