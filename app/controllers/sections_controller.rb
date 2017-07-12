@@ -8,6 +8,10 @@ class SectionsController < ApplicationController
   def show
   	
   end
+  action_auth_level :users, :instructor
+  def users
+
+  end
 
    def create
     # check for permission
@@ -76,6 +80,7 @@ class SectionsController < ApplicationController
     	redirect_to(course_sections_path) && return
 	end
 
+action_auth_level :editusers, :instructor
   def editusers
     user = CourseUserDatum.find(params['id'])
 
