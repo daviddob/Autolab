@@ -59,8 +59,12 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def current_assessments(now = DateTime.now)
-    assessments.where("start_at < :now AND end_at > :now", now: now)
+  def current_assessments(now = DateTime.now, user = nil)
+    if user == nil
+      assessments.where("start_at < :now AND end_at > :now", now: now)
+    else
+      assessments.where("start_at < :now AND end_at > :now", now: now).reject{|asmt| !asmt.is_released_for_this_user?(user)}
+    end
   end
 
   def full_name
@@ -151,7 +155,10 @@ class Course < ActiveRecord::Base
     assessments.pluck("DISTINCT category_name").sort
   end
 
-  def assessments_with_category(cat_name, isStudent = false)
+  def assessments_with_category(cat_name, isStudent = false, user = nil)
+    if user != nil
+      return assessments.where(category_name: cat_name).ordered.reject{|asmt| !asmt.is_released_for_this_user?(user)}
+    end
     if isStudent
       assessments.where(category_name: cat_name).ordered.released
     else

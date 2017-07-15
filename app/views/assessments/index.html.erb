@@ -22,7 +22,7 @@
       <% if idx % 3 == 0 %>
         <div class="clearfix hide-on-small-only"></div>
       <% end %>
-      <% asmts = @course.assessments_with_category(cat, @cud.student?) %>
+      <% asmts = @course.assessments_with_category(cat, @cud.student?, @cud) %>
       <% if asmts.any? %>
         <div class="col s12 m4">
           <div class="card hoverable">
@@ -32,8 +32,7 @@
 
             <div class="collection blue darken-3">
               <% asmts.each do |asmt| %>
-              <% asmt.deal_with_section_for_user(@cud) %> 
-              <% if asmt.released? %>
+              <% if asmt.is_released_for_this_user?(@cud)%>
                 <div class="collection-item">
                   <%= link_to asmt.display_name, course_assessment_url(@course, asmt),
                               {:class => "grey-text text-darken-3"} %>
