@@ -200,7 +200,7 @@ module AssessmentAutograde
       e.backtrace.each { |line| COURSE_LOGGER.log(line) }
       return -3, nil
     end
-
+    
 		upload_file_list.each do |f|
 			if !Pathname.new(f["localFile"]).file?
         flash[:error] = "Error while uploading autograding files."
@@ -423,7 +423,7 @@ module AssessmentAutograde
     else
         [handin, makefile, autograde]
     end
-
+    
   end
 
   ##
@@ -446,57 +446,6 @@ module AssessmentAutograde
 
     saveAutograde(submissions, feedback)
   end
-
-  def maxScore(submissions, scores, lines)
-    begin
-      fail "No submissions found. \n" if submissions.length == 0
-      autoresult = lines[lines.length - 1].chomp
-      #this is fine since if the file is not found, we create one for everyone in the group
-      submission = submissions[0]
-      ass_dir = @assessment.folder_path
-      filename = submission.course_user_datum.user.email + '.scorehistory'
-      directory = File.join(ass_dir, @assessment.handin_directory)
-      scoresFile = File.join(directory, filename)
-      if File.file?(scoresFile)
-        if @assessment.overwrites_method?(:parseAutoresult)
-          previousScores = @assessment.config_module.parseAutoresult(autoresult, true)
-        else
-          previousScores = parseAutoresult(File.read(scoresFile), true)
-        end
-        fail "Empty autoresult history string." if previousScores.keys.length == 0
-        previousTotal = 0
-        previousScores.each do |key|
-          previousTotal += previousScores[key]
-        end
-        #separate calculation in case assignment is updated after submissions
-        #have already started and problem keys/names are modified
-        currentTotal = 0
-        scores.each do |key|
-          currentTotal += scores[key]
-        end
-
-        if currentTotal >= previousTotal
-          #current total is higher, need to update the file
-          submissions.each do |s|
-            file = s.course_user_datum.user.email + '.scorehistory'
-            File.open(File.join(directory, file), 'w') do |f|
-              f.write(autoresult)
-            end
-          end
-        else
-          scores = previousScores
-          lines.insert(-2, "New score lower than previous score. Previous score recorded instead.\n" + "PREVIOUS SCORE:" +  File.read(scores_file) + "\n")
-        end
-      else
-        submissions.each do |s|
-          file = s.course_user_datum.user.email + '.scorehistory'
-          File.open(File.join(directory, file), 'w') do |f|
-            f.write(autoresult)
-          end
-        end
-      end
-      return scores, lines.join
-    end
 
   ##
   # saveAutograde - parses the autoresult returned by the
@@ -522,9 +471,6 @@ module AssessmentAutograde
 
       # Grab the autograde config info
       @autograde_prop = @assessment.autograder
-
-      #MAX FUNCTION
-      scores, feedback = maxScore(submissions, scores, autoresult, lines)
 
       # Record each of the scores extracted from the autoresult
       scores.keys.each do |key|
