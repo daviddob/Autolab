@@ -15,7 +15,7 @@ class SectionsController < ApplicationController
 
    def create
     # check for permission
-    unless current_user.administrator?
+    unless current_user.instructor?
       flash[:error] = "Permission denied."
       redirect_to(course_assessments_path) && return
     end
