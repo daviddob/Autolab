@@ -56,7 +56,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
                                               uid: data["uid"]).empty?
           current_user.authentications.create(provider: "CMU-Shibboleth",
                                               uid: data["uid"])
-        end
+				end
       end
       redirect_to root_path
     else
@@ -68,15 +68,18 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
       else
         # Skip sign up for CMU Shibboleth user
         data = request.env["omniauth.auth"]
-        @user = User.where(email: data["uid"]).first # email is uid in our case
-
+        @user = User.where(email: data["uid"]+"@buffalo.edu").first # email is uid in our case
+				
         # If user doesn't exist, create one first
         if @user.nil?
           @user = User.new
           @user.email = data["uid"]
-
+				
+					Rails.logger.info "TESTING!!!"
+					Rails.logger.info data
+					Rails.logger.info @user.email
           # Set user info based on LDAP lookup
-          if @user.email.include? "@andrew.cmu.edu"
+          if @user.email.include? "@buffalo.edu"
             ldapResult = User.ldap_lookup(@user.email.split("@")[0])
             if ldapResult
               @user.first_name = ldapResult[:first_name]
