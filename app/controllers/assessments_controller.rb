@@ -207,7 +207,7 @@ class AssessmentsController < ApplicationController
     @assessment.quiz = false
     @assessment.quizData = ""
     @assessment.max_submissions = params.include?(:max_submissions) ? params[:max_submissions] : -1
-
+    # @assessment.base_section_day =  params["sectionDependant"].nil? ? nil : Time.now + (60 * 60 * 24 * 7)
     if @assessment.embedded_quiz
       begin
         @assessment.embedded_quiz_form_data = params[:assessment][:embedded_quiz_form].read
@@ -389,6 +389,9 @@ class AssessmentsController < ApplicationController
 
   action_auth_level :show, :student
   def show
+    if !@assessment.is_released_for_this_user?(@cud) 
+      redirect_to course_assessments_path 
+    end
     set_handin
     extend_config_module(@assessment, @submission, @cud)
 
@@ -535,6 +538,13 @@ class AssessmentsController < ApplicationController
       @assessment.embedded_quiz_form_data = params[:assessment][:embedded_quiz_form].read
       @assessment.save!
     end
+    if @assessment.is_section_dependant
+    edit_assessment_params["base_section_day"] = params["course"]["start_at"]
+    edit_assessment_params["start_offset"] = params["startoffset"]
+    edit_assessment_params["end_offset"] = params["endoffset"]
+    edit_assessment_params["on_day"] = params["sameDay"].nil? ? 0 : 1
+    edit_assessment_params["lecture"] = params["lecture"].nil? ? 0 : 1
+  end
 
     flash[:success] = "Saved!" if @assessment.update!(edit_assessment_params)
 

@@ -514,7 +514,7 @@ private
     return 0 if aud.grade_type != AssessmentUserDatum::NORMAL
 
     # optimization: without applying extension, etc. check if before due date
-    return 0 if created_at <= assessment.due_at
+    return 0 if created_at <= aud.due_at
 
     # check if no due at (due to infinite extension)
     return 0 unless aud.due_at

@@ -75,7 +75,6 @@ module GradebookHelper
       # TODO: formalize score render stack, consolidate with computed score
       course.assessments.ordered.each do |a|
         next unless matrix.has_assessment? a.id
-
         cell = matrix.cell(a.id, cud.id)
         row[a.name] = round cell["final_score"]
         row["#{a.name}_submission_status"] = cell["submission_status"]

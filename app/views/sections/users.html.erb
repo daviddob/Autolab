@@ -1,0 +1,46 @@
+
+<table class="prettyBorder">
+	<thead>
+		<tr>
+			<th>&#8470;</th><!-- "No." symbol. -->
+			<th>Email</th>
+			<th>Lecture</th>
+			<th>Section</th>
+		</tr>
+	</thead>
+	<!-- Row index is set using CSS. -->
+	<% CourseUserDatum.where("course_id = ?", @course.id).each do |cu| %>
+	<tr class="user-row">
+		<td class="row-index"></td>
+		<td ><%= cu.email %></td>
+		<td class="lecture" user="<%= cu.id %>"><%= select_tag("lecture", options_from_collection_for_select(Sections.where("course_id=?",@course.id), 'name', 'name', cu.lecture), include_blank: true) %></td>
+		<td class="section" user="<%= cu.id %>"><%= select_tag("section", options_from_collection_for_select(Sections.where("course_id=?",@course.id), 'name', 'name', cu.section), include_blank: true) %></td>
+	</tr>
+	<% end %>
+</table>
+
+
+<script>
+
+$("#lecture,#section").change(function(){
+	update(JSON.stringify({id: this.parentNode.parentNode.getAttribute("user"),sectionName: this.value, lecture:(this.parentNode.parentNode.getAttribute("class") == "lecture") ? true : false}));
+});
+
+
+function update(data){
+	$.ajax({
+     type: "POST",
+     contentType: "application/json; charset=utf-8",
+     url: "editusers",
+     data : data,
+     dataType: "json",
+     success: function (result) {
+        
+     },
+     error: function (){
+        
+     }
+});
+}
+
+</script>

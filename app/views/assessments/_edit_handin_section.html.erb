@@ -3,28 +3,19 @@
   <%= javascript_include_tag "initialize_datetimepickers" %>
 <% end %>
 
-<%# Initialize datepickers by defining linked relationships (using IDs) %>
-<%= f.datetime_select :start_at,
-  style: "margin-top: 0 !important;",
-  help_text: "The time this assessment is released to students.",
-  less_than: "assessment_due_at assessment_end_at assessment_grading_deadline" %>
 
-<%= f.datetime_select :due_at,
-  style: "margin-top: 0 !important;",
-  help_text: "Students can submit before this time without being penalized or using grace days.",
-  greater_than: "assessment_start_at",
-  less_than: "assessment_end_at assessment_grading_deadline" %>
+<%= render :partial => "demo"%>
+
+<%# Initialize datepickers by defining linked relationships (using IDs) %>
 
 <%= f.datetime_select :end_at, class: "datepicker",
   style: "margin-top: 0 !important;",
-  help_text: "Last possible time that students can submit (except those granted extensions.)",
-  greater_than: "assessment_start_at assessment_due_at",
+  help_text: "Last possible time that students can submit (except those granted extensions.) this date is section independant.",
   less_than: "assessment_grading_deadline" %>
 
 <%= f.datetime_select :grading_deadline,
   style: "margin-top: 0 !important;",
-  help_text: "Time after which final scores are included in the gradebook",
-  greater_than: "assessment_start_at" %>
+  help_text: "Time after which final scores are included in the gradebook" %>
 
 <div class="form-group">
   <%= f.check_box :disable_handins,
@@ -49,20 +40,3 @@
 <div class="action_buttons">
   <%= f.submit "Save" , {:class=>"waves-effect waves-light btn primary"} %>
 </div>
-
-<script type="text/javascript">
-
-$(".datetimepicker").change(function(){
-  adjustDates();
-});
-
-
-function adjustDates(){
-  if(new Date($("#assessment_start_at").attr('value')).getTime() > new Date($("#assessment_due_at").attr('value')).getTime()){
-    $("#assessment_due_at").flatpickr({enableTime: true,altInput: true}).setDate(new Date($("#assessment_start_at").attr('value')).getTime() + 3600000);
-  }
-  if(new Date($("#assessment_start_at").attr('value')).getTime() > new Date($("#assessment_end_at").attr('value')).getTime()){
-    $("#assessment_end_at").flatpickr({enableTime: true,altInput: true}).setDate(new Date($("#assessment_start_at").attr('value')).getTime() + (3600000 * 2));
-  }
-}
-</script>

@@ -50,6 +50,7 @@ class Assessment < ActiveRecord::Base
   scope :ordered, -> { order(ORDERING) }
   scope :released, ->(as_of = Time.now) { where(RELEASED, as_of) }
   scope :unreleased, ->(as_of = Time.now) { where.not(RELEASED, as_of) }
+  
 
   # Misc.
   accepts_nested_attributes_for :late_penalty, :version_penalty, allow_destroy: true
@@ -107,6 +108,47 @@ class Assessment < ActiveRecord::Base
     path handin_directory
   end
 
+  # section code
+
+  def deal_with_section_for_user(user)
+    day_array = {"Sunday" => 0,"Monday" => 1,"Tuesday" => 2,"Wednesday" => 3,"Thursday" => 4,"Friday" => 5,"Saturday" => 6, "nextWeek" => 7}
+    section = Sections.where("name = ? AND course_id = ?", self.lecture? ? user.lecture : user.section, user.course_id).first
+    if(section.nil?)
+      return
+    end
+    if(!self.base_section_day.nil?)
+    temp = ((self.base_section_day-day_array[self.base_section_day.strftime("%A")]) + day_array[(self.on_day?) ? section.end.strftime("%A") : "nextWeek" ]).to_time
+    temp = temp + section.end.to_time.hour * 60 *60
+    temp = temp + section.end.to_time.min * 60
+    temp = temp - self.end_offset * 60
+    # abort temp.strftime("%Y-%m-%d %X").inspect
+    self.due_at = temp.strftime("%Y-%m-%d %X")
+
+
+    temps = ((self.base_section_day-day_array[self.base_section_day.strftime("%A")]) + day_array[(self.on_day?) ? section.start.strftime("%A") : "nextWeek"]).to_time
+    temps = temps + section.start.to_time.hour * 60 * 60
+    temps = temps + section.start.to_time.min * 60
+    temps = temps + self.start_offset * 60 
+    # abort temps.strftime("%Y-%m-%d %X").inspect
+    self.start_at = temps.strftime("%Y-%m-%d %X")
+   end
+
+  end
+
+  def is_released_for_this_user?(user)
+    deal_with_section_for_user(user)
+    if user.student?
+      self.released?
+    else
+      true
+    end
+  end
+
+  def is_section_dependant()
+    !self.base_section_day.nil?
+  end
+
+# end section code
   def writeup_path
     path writeup
   end
@@ -178,7 +220,7 @@ class Assessment < ActiveRecord::Base
   def construct_folder
     # this should construct the assessment folder and the handin folder
     FileUtils.mkdir_p(handin_directory_path)
-    dump_yaml if construct_default_config_file
+    dump_yaml if construct_default_config_filere
   end
 
   ##

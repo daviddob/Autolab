@@ -266,6 +266,7 @@ private
     user_id = id
     course.assessments.each do |a|
       next unless a.category_name == category
+      next unless a.is_released_for_this_user?(as_seen_by)
       input[a.name] ||= a.aud_for(id).final_score as_seen_by
     end
 

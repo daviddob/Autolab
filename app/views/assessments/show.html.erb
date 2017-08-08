@@ -3,6 +3,7 @@
   <%= javascript_include_tag 'validateIntegrity.js' %>
 <% end %>
 
+
 <%# Make sure these options are not on the general user options list.  %>
 <%# We have to do this because we exposed the internal interface for building options lists %>
 <%# and some users have fiddled with this in their assessment.rb file %>
@@ -144,7 +145,7 @@
         </p>
 
         <p class="valign-wrapper">
-          <i class="valign material-icons">today</i>&nbsp;&nbsp;Last day to handin:&nbsp;&nbsp;<b><span class="moment-date-time"> <%= end_at_display(@aud.end_at false) %></span></b>
+          <i class="valign material-icons">today</i>&nbsp;&nbsp;Last day to handin:&nbsp;&nbsp;<b><span class="moment-date-time"><%=  end_at_display(@aud.end_at false) %></span></b>
 
         </p>
 

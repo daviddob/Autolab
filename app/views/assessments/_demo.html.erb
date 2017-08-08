@@ -1,0 +1,139 @@
+<% content_for :javascripts do %>
+<%= javascript_include_tag "initialize_datetimepickers" %>
+<% end %>
+
+
+<%= form_for @course ,builder: FormBuilderWithDateTimeInput do |f| %>
+<%=f.date_select :start_at,
+style: "margin-top: 0 !important;",
+help_text: "Please pick a day during the week that you wish this assignement to be scaled around (please note weeks start on sunday)."
+%>
+  <% end %>
+
+<br>
+
+<input name="sameDay" id="sameDay" type="checkbox">
+<label for="sameDay">start the assignment on the sunday that starts this week</label>
+<br>
+<input name="lecture" id="lecture" type="checkbox">
+<label for="lecture">use the sudents assigned lecture? if this is not checked it will use the assigned section.</label>
+
+<hr>
+<div>
+<label for="startoffset">Offset in minutes into the section should the assignement start</label>
+<%= number_field_tag "startoffset",nil, :value => 0%>
+</div>
+<br>
+<div>
+<label for="endoffset">Offset in minutes before the section ends should the assignement end</label>
+<%= number_field_tag "endoffset",nil, :value => 0%>
+</div>
+
+<hr>
+<h6>Please confirm in the table below that all dates and time look correct.</h6>
+<table class="prettyBorder sortable" >
+	<thead>
+		<tr>
+			<th>&#8470;</th><!-- "No." symbol. -->
+			<th>Name</th>
+			<th>Start Time</th>
+			<th>Due Time</th>
+		</tr>
+	</thead>
+	<!-- Row index is set using CSS. -->
+	<% Sections.where("course_id = ?", @course.id).each do |sec| %>
+	<tr class="user-row">
+		<td class="row-index"></td>
+		<td id="<%= sec.name %>"><%= sec.name %></td>
+		<td id="<%= sec.name %>_start" time="<%= sec.start %>"></td>
+		<td id="<%= sec.name %>_end" time="<%= sec.end %>"></td>
+	</tr>
+	<% end %>
+</table>
+
+
+<script type="text/javascript">
+	document.getElementById("course_start_at").setAttribute("onchange", "go()");
+	document.getElementById("course_start_at").value = new Date(<%= @assessment.base_section_day.to_time.to_i %> * 1000);
+	document.getElementById("sameDay").checked = <%= @assessment.on_day %>;
+	document.getElementById("lecture").checked = <%= @assessment.lecture %>;
+	document.getElementById("startoffset").value = <%= @assessment.start_offset %>;
+	document.getElementById("endoffset").value = <%= @assessment.end_offset %>;
+	var stuff = JSON.parse('<%= raw Sections.where("course_id = ?", @course.id).to_json %>');
+	var value = "";
+	var sameday = 0;
+	var dayinmilli = 86400000;
+	var minuteinmilli = 60000;
+	var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+	$(".select_menu").change(function(){          
+
+		value =  $("#" + this.id).val();
+		go();
+	});
+
+	$("#sameDay").change(function(){
+		sameday = this.checked;
+		go();
+	});
+
+	$("#startoffset,#endoffset").change(function(){
+		go();
+	});
+
+	function go(){
+	//deal with what date the user picks
+	var start = new Date(document.getElementById("course_start_at").value);
+	start.setHours(0,0,0)
+	var temps = new Date(start);
+	while(temps.getDay() != 0){
+		temps = new Date(temps.getTime() - dayinmilli);
+	}
+	//deal with what sections user picks
+	for (i = 0; i < stuff.length; i++) {
+
+		var labDate = new Date(stuff[i].start);
+		var labEnd  = new Date(stuff[i].end);
+			// document.getElementById("labstart").innerHTML = labDate;
+
+
+			var temp = new Date(temps);
+			temp.setHours(0,0,0);
+
+			var tempEnd = new Date(temps);
+			tempEnd.setHours(0,0,0);
+
+			if(labDate.getDay() == temp.getDay() && !sameday){
+				temp = new Date(temp.getTime() + dayinmilli);
+			}
+
+			while(labDate.getDay() != temp.getDay()){
+				temp = new Date(temp.getTime() + dayinmilli);
+			}
+
+			if(labEnd.getDay() == tempEnd.getDay() && !sameday){
+				tempEnd = new Date(tempEnd.getTime() + dayinmilli);
+			}
+
+			while(labEnd.getDay() != tempEnd.getDay()){
+				tempEnd = new Date(tempEnd.getTime() + dayinmilli);
+			}
+
+
+			temp.setHours(labDate.getHours(), labDate.getMinutes(),labDate.getSeconds());
+			tempEnd.setHours(labEnd.getHours(), labEnd.getMinutes(),labEnd.getSeconds());
+
+
+
+			temp = new Date(temp.getTime() + (parseInt(document.getElementById("startoffset").value) * minuteinmilli));
+			tempEnd = new Date(tempEnd.getTime() - (parseInt(document.getElementById("endoffset").value)*minuteinmilli));
+
+
+			document.getElementById(stuff[i].name + "_start").innerHTML = temp;
+			document.getElementById(stuff[i].name + "_end").innerHTML = tempEnd;
+
+
+		}
+	}
+	go();
+</script>

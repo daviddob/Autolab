@@ -1,0 +1,4 @@
+class SectionUserDataController < ApplicationController
+
+
+end
