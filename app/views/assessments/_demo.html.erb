@@ -61,7 +61,7 @@ help_text: "Please pick a day during the week that you wish this assignement to 
 	document.getElementById("endoffset").value = <%= @assessment.end_offset %>;
 	var stuff = JSON.parse('<%= raw Sections.where("course_id = ?", @course.id).to_json %>');
 	var value = "";
-	var sameday = 0;
+	var sameday = document.getElementById("sameDay").checked;
 	var dayinmilli = 86400000;
 	var minuteinmilli = 60000;
 	var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
