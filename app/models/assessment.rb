@@ -114,7 +114,7 @@ class Assessment < ActiveRecord::Base
     day_array = {"Sunday" => 0,"Monday" => 1,"Tuesday" => 2,"Wednesday" => 3,"Thursday" => 4,"Friday" => 5,"Saturday" => 6, "nextWeek" => 7}
     section = Sections.where("name = ? AND course_id = ?", self.lecture? ? user.lecture : user.section, user.course_id).first
     if(section.nil?)
-      return
+      return false
     end
     if(!self.base_section_day.nil?)
     temp = ((self.base_section_day-day_array[self.base_section_day.strftime("%A")]) + day_array[(self.on_day?) ? section.end.strftime("%A") : "nextWeek" ]).to_time
@@ -132,15 +132,18 @@ class Assessment < ActiveRecord::Base
     # abort temps.strftime("%Y-%m-%d %X").inspect
     self.start_at = temps.strftime("%Y-%m-%d %X")
    end
-
+   return true
   end
 
   def is_released_for_this_user?(user)
-    deal_with_section_for_user(user)
-    if user.student?
-      self.released?
+    if !user.student?
+      return true
     else
-      true
+      if !deal_with_section_for_user(user)
+        return false
+      else
+        self.released?
+      end
     end
   end
 
@@ -220,7 +223,7 @@ class Assessment < ActiveRecord::Base
   def construct_folder
     # this should construct the assessment folder and the handin folder
     FileUtils.mkdir_p(handin_directory_path)
-    dump_yaml if construct_default_config_filere
+    dump_yaml if construct_default_config_file
   end
 
   ##
