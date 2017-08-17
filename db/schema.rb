@@ -229,6 +229,13 @@ ActiveRecord::Schema.define(version: 20170101140555) do
   add_index "scores", ["problem_id", "submission_id"], name: "problem_submission_unique", unique: true, using: :btree
   add_index "scores", ["submission_id"], name: "index_scores_on_submission_id", using: :btree
 
+  create_table "sections", force: :cascade do |t|
+    t.string   "name",      limit: 255
+    t.integer  "course_id", limit: 4
+    t.datetime "start"
+    t.datetime "end"
+  end
+
   create_table "submissions", force: :cascade do |t|
     t.integer  "version",                   limit: 4
     t.integer  "course_user_datum_id",      limit: 4
