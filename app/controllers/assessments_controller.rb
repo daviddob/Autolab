@@ -539,7 +539,7 @@ class AssessmentsController < ApplicationController
       @assessment.save!
     end
     if @assessment.is_section_dependant
-    edit_assessment_params["base_section_day"] = params["course"]["start_at"]
+    edit_assessment_params["base_section_day"] = params["assessment"]["start_at"]
     edit_assessment_params["start_offset"] = params["startoffset"]
     edit_assessment_params["end_offset"] = params["endoffset"]
     edit_assessment_params["on_day"] = params["sameDay"].nil? ? 0 : 1
