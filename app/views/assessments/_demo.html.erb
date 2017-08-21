@@ -3,12 +3,11 @@
 <% end %>
 
 
-<%= form_for @course ,builder: FormBuilderWithDateTimeInput do |f| %>
+
 <%=f.date_select :start_at,
 style: "margin-top: 0 !important;",
 help_text: "Please pick a day during the week that you wish this assignement to be scaled around (please note weeks start on sunday)."
 %>
-  <% end %>
 
 <br>
 
@@ -53,8 +52,8 @@ help_text: "Please pick a day during the week that you wish this assignement to 
 
 
 <script type="text/javascript">
-	document.getElementById("course_start_at").setAttribute("onchange", "go()");
-	document.getElementById("course_start_at").value = new Date(<%= @assessment.base_section_day.to_time.to_i %> * 1000);
+	document.getElementById("assessment_start_at").setAttribute("onchange", "go()");
+	document.getElementById("assessment_start_at").value = new Date(<%= @assessment.base_section_day.to_time.to_i %> * 1000);
 	document.getElementById("sameDay").checked = <%= @assessment.on_day %>;
 	document.getElementById("lecture").checked = <%= @assessment.lecture %>;
 	document.getElementById("startoffset").value = <%= @assessment.start_offset %>;
@@ -83,7 +82,7 @@ help_text: "Please pick a day during the week that you wish this assignement to 
 
 	function go(){
 	//deal with what date the user picks
-	var start = new Date(document.getElementById("course_start_at").value);
+	var start = new Date(document.getElementById("assessment_start_at").value);
 	start.setHours(0,0,0)
 	var temps = new Date(start);
 	while(temps.getDay() != 0){
