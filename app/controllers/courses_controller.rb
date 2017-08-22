@@ -84,7 +84,7 @@ class CoursesController < ApplicationController
     end
 
     
-    re = /[^A-Za-z0-9._~:\.\/\[\]@!$&'()*+,;=`]/
+    re = /[^A-Za-z0-9._~:\.\/\[\]@!$&'()*+,;=`\-_]/
 
     # Check for matches
     new_course_params['name'].scan(re) do |match|
