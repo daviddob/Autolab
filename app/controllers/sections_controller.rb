@@ -32,6 +32,11 @@ class SectionsController < ApplicationController
     	redirect_to(course_sections_path) && return
     end
 
+    if data["start time"] >= data["end time"]
+      flash[:error] = "please make sure the end time is after the start time"
+      redirect_to(course_sections_path) && return
+    end
+
 
     # see if we want to delete the record
   	if(params["commit"] == "Delete")
