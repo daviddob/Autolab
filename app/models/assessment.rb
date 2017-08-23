@@ -117,14 +117,14 @@ class Assessment < ActiveRecord::Base
       return false
     end
     if(!self.base_section_day.nil?)
-    temp = ((self.base_section_day-day_array[self.base_section_day.strftime("%A")]) + day_array[(self.on_day? && day_array[section.end.strftime("%A")] == 0) ? "nextWeek" : section.end.strftime("%A") ]).to_time
+    temp = ((self.base_section_day-day_array[self.base_section_day.strftime("%A")]) + day_array[(self.on_day? && day_array[section.end.strftime("%A")] == 0) ? section.end.strftime("%A") : "nextWeek"]).to_time
     temp = temp + section.end.to_time.hour * 60 *60
     temp = temp + section.end.to_time.min * 60
     temp = temp - self.end_offset * 60
     # abort temp.strftime("%Y-%m-%d %X").inspect
     self.due_at = temp.strftime("%Y-%m-%d %X")
 
-    temps = ((self.base_section_day-day_array[self.base_section_day.strftime("%A")]) + day_array[(self.on_day? && day_array[section.start.strftime("%A")] == 0) ? "nextWeek" :  section.start.strftime("%A")]).to_time
+    temps = ((self.base_section_day-day_array[self.base_section_day.strftime("%A")]) + day_array[(self.on_day? && day_array[section.start.strftime("%A")] == 0) ? section.start.strftime("%A") : "nextWeek" ]).to_time
     temps = temps + section.start.to_time.hour * 60 * 60
     temps = temps + section.start.to_time.min * 60
     temps = temps + self.start_offset * 60 
