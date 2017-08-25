@@ -140,9 +140,6 @@ class Assessment < ActiveRecord::Base
       return true
     else
       if !deal_with_section_for_user(user)
-        if self.id == 36
-         abort deal_with_section_for_user(user).inspect 
-        end
         return false
       else
         self.released?
