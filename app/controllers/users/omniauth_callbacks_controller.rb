@@ -63,6 +63,11 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
       @user = User.find_for_shibboleth_oauth(request.env["omniauth.auth"], current_user)
 
       if @user
+        data = request.env["omniauth.auth"]
+        @user.first_name = data["info"]["name"]
+        @user.last_name = data["info"]["last_name"]
+        @user.person_number = data["info"]["person_number"]
+        @user.save!
         sign_in_and_redirect @user, event: :authentication # this will throw if @user is not activated
         set_flash_message(:notice, :success, kind: "Shibboleth") if is_navigational_format?
       else
@@ -79,6 +84,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
 					if @user.email.include? "@buffalo.edu"
 						@user.first_name = data["info"]["name"]
 						@user.last_name = data["info"]["last_name"]
+            @user.person_number = data["info"]["person_number"]
 					end
 					
 					if @user.email.include? "@andrew.cmu.edu"
