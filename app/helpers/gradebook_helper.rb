@@ -14,6 +14,8 @@ module GradebookHelper
       { id: "last_name", name: "Last", field: "last_name",
         sortable: true, width: 100, cssClass: "last_name",
         headerCssClass: "last_name" },
+      { id: "person_number", name: "person #", field: "person_number",
+        sortable: true, width: 100 },
       { id: "section", name: "Sec", field: "section",
         sortable: true, width: 50 }
     ]
@@ -71,6 +73,7 @@ module GradebookHelper
       row["first_name"] = cud.user.first_name
       row["last_name"] = cud.user.last_name
       row["section"] = cud.section
+      row["person_number"] = cud.user.person_number
 
       # TODO: formalize score render stack, consolidate with computed score
       course.assessments.ordered.each do |a|
