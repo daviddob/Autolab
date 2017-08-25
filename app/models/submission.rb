@@ -133,6 +133,14 @@ class Submission < ActiveRecord::Base
       if params["formfield3"]
           form_hash[assessment.getTextfields[2]] = params["formfield3"]
       end
+      assessment = Assessment.find(self.assessment_id)
+      if(!assessment.base_section_day.nil?)
+        if(assessment.lecture?)
+         params["section"] = CourseUserDatum.find(self.course_user_datum_id).lecture
+       else
+        params["section"] = CourseUserDatum.find(self.course_user_datum_id).section
+        end
+      end
       self.settings = form_hash.to_json
       self.save!
   end

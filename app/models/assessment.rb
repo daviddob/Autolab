@@ -113,10 +113,11 @@ class Assessment < ActiveRecord::Base
   def deal_with_section_for_user(user)
     day_array = {"Sunday" => 0,"Monday" => 1,"Tuesday" => 2,"Wednesday" => 3,"Thursday" => 4,"Friday" => 5,"Saturday" => 6, "nextWeek" => 7}
     section = Sections.where("name = ? AND course_id = ?", self.lecture? ? user.lecture : user.section, user.course_id).first
-    if(section.nil?)
-      return false
-    end
+
     if(!self.base_section_day.nil?)
+      if(section.nil?)
+        return false
+      end
     temp = ((self.base_section_day-day_array[self.base_section_day.strftime("%A")]) + day_array[(self.on_day? && day_array[section.end.strftime("%A")] == 0) ? section.end.strftime("%A") : "nextWeek"]).to_time
     temp = temp + section.end.to_time.hour * 60 *60
     temp = temp + section.end.to_time.min * 60
@@ -139,6 +140,9 @@ class Assessment < ActiveRecord::Base
       return true
     else
       if !deal_with_section_for_user(user)
+        if self.id == 36
+         abort deal_with_section_for_user(user).inspect 
+        end
         return false
       else
         self.released?
