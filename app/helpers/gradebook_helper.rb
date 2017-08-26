@@ -105,7 +105,7 @@ module GradebookHelper
   end
 
   def csv_header(matrix, course)
-    header = %w(Email first_name last_name Lecture Section School Major Year)
+    header = %w(Email first_name last_name Person_Number Lecture Section School Major Year)
     course.assessment_categories.each do |cat|
       next unless matrix.has_category? cat
       course.assessments_with_category(cat).each do |asmt|
@@ -138,7 +138,7 @@ module GradebookHelper
         next unless matrix.has_cud? cud.id
 
         # general info
-        row = [cud.user.email, cud.user.first_name, cud.user.last_name, cud.lecture, cud.section, cud.school, cud.major, cud.year]
+        row = [cud.user.email, cud.user.first_name, cud.user.last_name, cud.user.person_number, cud.lecture, cud.section, cud.school, cud.major, cud.year]
 
         # assessment status (see AssessmentUserDatum.status), category averages
         course.assessment_categories.each do |cat|
