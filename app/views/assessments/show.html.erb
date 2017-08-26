@@ -141,11 +141,11 @@
         <p class="valign-wrapper">
           <i class="material-icons valign">access_time</i>
             &nbsp;&nbsp;Due<% if @extension then %>&nbsp;(with <%=@extension.days %> day extension)<% end %>:&nbsp;
-            <b><% if due_at_display @aud.due_at != "Not applicable (infinite extension granted)" %><span class="moment-date-time"> <%= due_at_display @aud.due_at %></span><% else %><span> <%= due_at_display @aud.due_at %></span><% end %></b>
+            <b><% if (due_at_display (@aud.due_at)) != "Not applicable (infinite extension granted)" %><span class="moment-date-time"> <%= due_at_display @aud.due_at %></span><% else %><span> <%= due_at_display @aud.due_at %></span><% end %></b>
         </p>
 
         <p class="valign-wrapper">
-          <i class="valign material-icons">today</i>&nbsp;&nbsp;Last day to handin:&nbsp;&nbsp;<b><% if end_at_display @aud.end_at != "Not applicable (infinite extension granted)" %><span class="moment-date-time"> <%= end_at_display @aud.end_at %></span><% else %><span> <%= end_at_display @aud.end_at %></span><% end %></b>
+          <i class="valign material-icons">today</i>&nbsp;&nbsp;Last day to handin:&nbsp;&nbsp;<b><% if (end_at_display(@aud.end_at) != "Not applicable (infinite extension granted)") %><span class="moment-date-time"> <%= end_at_display @aud.end_at %></span><% else %><span> <%= end_at_display @aud.end_at %></span><% end %></b>
 
         </p>
 
