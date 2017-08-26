@@ -24,7 +24,7 @@ module AssessmentHandin
 
       contents = params[:submission]["embedded_quiz_form_answer"].to_s
 
-      out_file = File.new("out.txt", "w+")
+      out_file = Tempfile.new("/tmp/embedded_form", "w+")
       out_file.puts(contents)
 
       params[:submission]["file"] = out_file
