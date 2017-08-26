@@ -136,9 +136,9 @@ class Submission < ActiveRecord::Base
       assessment = Assessment.find(self.assessment_id)
       if(!assessment.base_section_day.nil?)
         if(assessment.lecture?)
-         params["section"] = CourseUserDatum.find(self.course_user_datum_id).lecture
+          form_hash["section_id"] = CourseUserDatum.find(self.course_user_datum_id).lecture
        else
-        params["section"] = CourseUserDatum.find(self.course_user_datum_id).section
+          form_hash["section_id"] = CourseUserDatum.find(self.course_user_datum_id).section
         end
       end
       self.settings = form_hash.to_json
