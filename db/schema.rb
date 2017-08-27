@@ -100,9 +100,8 @@ ActiveRecord::Schema.define(version: 20170926061647) do
     t.date     "base_section_day"
     t.integer  "start_offset",            limit: 4,     default: 0
     t.integer  "end_offset",              limit: 4,     default: 0
-    t.integer  "on_day",                  limit: 1,     default: 0
-    t.integer  "lecture",                 limit: 1,     default: 0
-    t.boolean  "maxOrLatest",             limit: 1,     default: false
+    t.boolean  "on_day",                  limit: 1,     default: false
+    t.boolean  "lecture",                 limit: 1,     default: false
     t.boolean  "assignCA",                limit: 1,     default: false
   end
 
@@ -233,7 +232,6 @@ ActiveRecord::Schema.define(version: 20170926061647) do
     t.datetime "updated_at"
     t.boolean  "released",      limit: 1,        default: false
     t.integer  "grader_id",     limit: 4
-    t.float    "MAXSCORE",      limit: 24,       default: 0.0
   end
 
   add_index "scores", ["problem_id", "submission_id"], name: "problem_submission_unique", unique: true, using: :btree
