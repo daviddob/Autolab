@@ -106,6 +106,13 @@ class Submission < ActiveRecord::Base
     elsif upload["tar"]
       self.mime_type = "application/x-tgz"
     end
+
+    if assessment.has_autograder?
+      self.grader = "Autolab"
+    else
+      self.grader = "Unassigned"
+    end
+
     save_additional_form_fields(upload)
     self.save!
     settings_file = course_user_datum.user.email + "_" +
@@ -133,6 +140,14 @@ class Submission < ActiveRecord::Base
       if params["formfield3"]
           form_hash[assessment.getTextfields[2]] = params["formfield3"]
       end
+      assessment = Assessment.find(self.assessment_id)
+      if(!assessment.base_section_day.nil?)
+        if(assessment.lecture?)
+          form_hash["section_id"] = CourseUserDatum.find(self.course_user_datum_id).lecture
+       else
+          form_hash["section_id"] = CourseUserDatum.find(self.course_user_datum_id).section
+        end
+      end
       self.settings = form_hash.to_json
       self.save!
   end
@@ -143,6 +158,11 @@ class Submission < ActiveRecord::Base
       else
           return Hash.new
       end
+  end
+
+  def set_grader(grader)
+    self.grader = grader
+    self.save!
   end
 
   def archive_handin
@@ -513,11 +533,11 @@ private
     # shouldn't be considered late
     return 0 if aud.grade_type != AssessmentUserDatum::NORMAL
 
-    # optimization: without applying extension, etc. check if before due date
-    return 0 if created_at <= assessment.due_at
-
     # check if no due at (due to infinite extension)
     return 0 unless aud.due_at
+
+    # without applying extension, etc. check if before due date
+    return 0 if created_at <= aud.due_at
 
     # how late is the submission?
     late_by = created_at - aud.due_at

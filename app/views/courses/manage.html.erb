@@ -25,6 +25,8 @@
                 { title: "Modify the properties for this course" } %></li>
             <li><%= link_to "Manage students", [:users, @course],
                 { title: "Create, modify, and delete user accounts" } %></li>
+            <li><%= link_to "Manage sections", course_sections_path(@course),
+                { title: "Create and Modify sections" } %></li>
             <li><%= link_to "Install assessment", [:installAssessment, @course, :assessments], 
                 { title: "Create an assessment from scratch or install one from an existing directory" } %></li>
             <li><%= link_to "Send bulk email", [:email, @course],

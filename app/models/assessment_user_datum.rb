@@ -138,6 +138,7 @@ class AssessmentUserDatum < ActiveRecord::Base
   end
 
   def penalty_late_days
+        # abort assessment.inspect
     (s = latest_submission) ? s.penalty_late_days : 0
   end
 
@@ -158,6 +159,7 @@ class AssessmentUserDatum < ActiveRecord::Base
   # Due date for user
   # If there is an infinite extension, then due_at is nil.
   def due_at
+    assessment.deal_with_section_for_user(CourseUserDatum.find_by(id:self.course_user_datum_id))
     apply_extension(assessment.due_at, extension)
   end
 

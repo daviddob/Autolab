@@ -24,7 +24,7 @@
 <%= f.datetime_select :grading_deadline,
   style: "margin-top: 0 !important;",
   help_text: "Time after which final scores are included in the gradebook",
-  greater_than: "assessment_start_at assessment_due_at assessment_end_at" %>
+  greater_than: "assessment_start_at" %>
 
 <div class="form-group">
   <%= f.check_box :disable_handins,
@@ -47,5 +47,22 @@
 <%= f.text_field :max_size, help_text: "The maximum size that a handin file can have, in megabytes (MB)." %>
 
 <div class="action_buttons">
-  <%= f.submit "Save" , {:class=>"waves-effect waves-light btn primary"} %>
+  <%= f.submit "Save"  %>
 </div>
+
+<script type="text/javascript">
+
+$(".datetimepicker").change(function(){
+  adjustDates();
+});
+
+
+function adjustDates(){
+  if(new Date($("#assessment_start_at").attr('value')).getTime() > new Date($("#assessment_due_at").attr('value')).getTime()){
+    $("#assessment_due_at").flatpickr({enableTime: true,altInput: true}).setDate(new Date($("#assessment_start_at").attr('value')).getTime() + 3600000);
+  }
+  if(new Date($("#assessment_start_at").attr('value')).getTime() > new Date($("#assessment_end_at").attr('value')).getTime()){
+    $("#assessment_end_at").flatpickr({enableTime: true,altInput: true}).setDate(new Date($("#assessment_start_at").attr('value')).getTime() + (3600000 * 2));
+  }
+}
+</script>

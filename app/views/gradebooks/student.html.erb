@@ -49,6 +49,7 @@
               <th>Final Score</th>
             </tr>
               <% @course.assessments_with_category(cat, @cud.student?).each do |asmt| %>
+               <% next unless asmt.is_released_for_this_user?(@_cud) %>
                 <% aud = asmt.aud_for @_cud  %>
                 <tr>
                   <td>

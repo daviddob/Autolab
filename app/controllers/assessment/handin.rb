@@ -23,8 +23,8 @@ module AssessmentHandin
     if @assessment.embedded_quiz
 
       contents = params[:submission]["embedded_quiz_form_answer"].to_s
-
-      out_file = File.new("out.txt", "w+")
+			tmp_uuid = SecureRandom.hex 32
+      out_file = File.new("/tmp/embedded_form_"+tmp_uuid, "w+")
       out_file.puts(contents)
 
       params[:submission]["file"] = out_file

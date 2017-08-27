@@ -56,6 +56,9 @@
 <p>
 <table class="prettyBorder" id="submissions">
   <% headers = ["Submitted By", "Version", "Submission Date (YYYY-MM-DD)", "File", "IP Address", "Actions", "isLatest"] %>
+  <% if @assessment.assignCA then %>
+    <% headers.push("Grader") %>
+  <% end %>
   <% if @assessment.has_custom_form then %>
     <% if @assessment.getLanguages.size > 0 then %>
         <% headers.push("Language") %>
@@ -112,6 +115,9 @@
       </td>
       <td><%= submission.latest? %>
       </td>
+      <% if @assessment.assignCA then %>
+        <td><%= submission.grader %></td>
+      <% end %>
       <% if @assessment.has_custom_form then %>
         <% if @assessment.getLanguages.size > 0 then %>
             <td><%= submission.getSettings["Language"] %></td>

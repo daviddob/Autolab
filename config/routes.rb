@@ -1,4 +1,5 @@
 Autolab3::Application.routes.draw do
+
   root "courses#index"
 
   devise_for :users, controllers: { omniauth_callbacks: "users/omniauth_callbacks",
@@ -25,6 +26,10 @@ Autolab3::Application.routes.draw do
   end
 
   resources :courses, param: :name do
+    resource :sections do
+      get "users"
+      post "editusers"
+    end
     resources :schedulers
     resources :jobs, only: :index do
       get "getjob", on: :member
@@ -89,6 +94,8 @@ Autolab3::Application.routes.draw do
         get "history"
         get "viewGradesheet"
         get "writeup"
+        get "assignCA"
+        get "unassignCA"
         get "handout"
 
         # autograde actions

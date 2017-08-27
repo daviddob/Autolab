@@ -31,7 +31,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
         if current_user.authentications.where(provider: data["provider"],
                                               uid: data["uid"]).empty?
           current_user.authentications.create(provider: data["provider"],
-                                              uid: data["uid"])
+                                              uid: data["uid"]+"@buffalo.edu")
         end
       end
       redirect_to root_path
@@ -56,27 +56,37 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
                                               uid: data["uid"]).empty?
           current_user.authentications.create(provider: "CMU-Shibboleth",
                                               uid: data["uid"])
-        end
+				end
       end
       redirect_to root_path
     else
       @user = User.find_for_shibboleth_oauth(request.env["omniauth.auth"], current_user)
 
       if @user
+        data = request.env["omniauth.auth"]
+        @user.first_name = data["info"]["name"]
+        @user.last_name = data["info"]["last_name"]
+        @user.person_number = data["info"]["person_number"]
+        @user.save!
         sign_in_and_redirect @user, event: :authentication # this will throw if @user is not activated
         set_flash_message(:notice, :success, kind: "Shibboleth") if is_navigational_format?
       else
         # Skip sign up for CMU Shibboleth user
         data = request.env["omniauth.auth"]
-        @user = User.where(email: data["uid"]).first # email is uid in our case
-
+        @user = User.where(email: data["uid"]+"@buffalo.edu").first # email is uid in our case
         # If user doesn't exist, create one first
         if @user.nil?
           @user = User.new
-          @user.email = data["uid"]
-
+          @user.email = data["uid"]+"@buffalo.edu"
           # Set user info based on LDAP lookup
-          if @user.email.include? "@andrew.cmu.edu"
+          
+					if @user.email.include? "@buffalo.edu"
+						@user.first_name = data["info"]["name"]
+						@user.last_name = data["info"]["last_name"]
+            @user.person_number = data["info"]["person_number"]
+					end
+					
+					if @user.email.include? "@andrew.cmu.edu"
             ldapResult = User.ldap_lookup(@user.email.split("@")[0])
             if ldapResult
               @user.first_name = ldapResult[:first_name]
@@ -96,6 +106,12 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
           @user.password_confirmation = temp_pass
           @user.skip_confirmation!
 
+        end
+
+				if @user.email.include? "@buffalo.edu"
+					@user.first_name = data["info"]["name"]
+          @user.last_name = data["info"]["last_name"]
+          @user.person_number = data["info"]["person_number"]
         end
 
         @user.authentications.new(provider: "CMU-Shibboleth",
