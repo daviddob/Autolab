@@ -49,7 +49,7 @@
 <tr class="<%= aud_special_grade_type?(s.aud) && @cud.instructor? ? "special_submission" : "" %>">
   <td class="enumerator"></td>
   <td class="id" data-submission-id="<%= s.id.to_s %>">
-        <% if @cud.user.email != s.grader then %>
+        <% if @cud.user.email.downcase != s.grader.downcase then %>
             <%= s.course_user_datum.last_name %>, <%= s.course_user_datum.first_name %>
         <% else %>
             <font color = "ff0000"><%= s.course_user_datum.last_name %>, <%= s.course_user_datum.first_name %></font>
