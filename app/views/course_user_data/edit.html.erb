@@ -82,7 +82,7 @@
       <%= t.text_field :value, :size => 18 %>
       <%= t.select :kind, options_for_select({"points" => "points", "%" => "percent"}, :selected => (@editCUD.tweak ? @editCUD.tweak.kind : "points")) %>
     <% end %>
-    </td>btn primary handin-btn
+    </td>
     <td class="smallText">A tweak is a positive or negative value that adjusts the student's course average.<br>Ex: A tweak of 5 points would increase the student's course average by 5 points. </td>
   </tr>
 
