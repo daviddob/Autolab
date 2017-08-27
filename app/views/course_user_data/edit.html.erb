@@ -108,7 +108,7 @@
   <tr><th>Instructor?</th><td><%= f.check_box :instructor %><label for="course_user_datum_instructor"></label></td>
   <td class="smallText">Instructors have full read/write access to the course. </td></tr>
 
-  <tr><th>Course assistant?</th><td onclick="tavalidation();"><label for="course_user_datum_course_assistant"></label><%= f.check_box :course_assistant %></td>
+  <tr><th>Course assistant?</th><td onclick="tavalidation();"><%= f.check_box :course_assistant %><label for="course_user_datum_course_assistant"></label></td>
   <td class="smallText">Course assistants can assign scores to problems and nothing else.</td></tr>
   <tr><th></th>
   <td></td>

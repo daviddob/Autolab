@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170101140555) do
+ActiveRecord::Schema.define(version: 20170926061647) do
 
   create_table "annotations", force: :cascade do |t|
     t.integer  "submission_id", limit: 4
@@ -97,6 +97,13 @@ ActiveRecord::Schema.define(version: 20170101140555) do
     t.text     "embedded_quiz_form_data", limit: 65535
     t.boolean  "embedded_quiz",           limit: 1
     t.binary   "embedded_quiz_form",      limit: 65535
+    t.date     "base_section_day"
+    t.integer  "start_offset",            limit: 4,     default: 0
+    t.integer  "end_offset",              limit: 4,     default: 0
+    t.integer  "on_day",                  limit: 1,     default: 0
+    t.integer  "lecture",                 limit: 1,     default: 0
+    t.boolean  "maxOrLatest",             limit: 1,     default: false
+    t.boolean  "assignCA",                limit: 1,     default: false
   end
 
   create_table "attachments", force: :cascade do |t|
@@ -128,18 +135,20 @@ ActiveRecord::Schema.define(version: 20170101140555) do
   end
 
   create_table "course_user_data", force: :cascade do |t|
-    t.string   "lecture",          limit: 255
-    t.string   "section",          limit: 255, default: ""
-    t.string   "grade_policy",     limit: 255, default: ""
-    t.integer  "course_id",        limit: 4,                   null: false
+    t.string   "lecture",             limit: 255
+    t.string   "section",             limit: 255,   default: ""
+    t.string   "grade_policy",        limit: 255,   default: ""
+    t.integer  "course_id",           limit: 4,                     null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "instructor",       limit: 1,   default: false
-    t.boolean  "dropped",          limit: 1,   default: false
-    t.string   "nickname",         limit: 255
-    t.boolean  "course_assistant", limit: 1,   default: false
-    t.integer  "tweak_id",         limit: 4
-    t.integer  "user_id",          limit: 4,                   null: false
+    t.boolean  "instructor",          limit: 1,     default: false
+    t.boolean  "dropped",             limit: 1,     default: false
+    t.string   "nickname",            limit: 255
+    t.boolean  "course_assistant",    limit: 1,     default: false
+    t.integer  "tweak_id",            limit: 4
+    t.integer  "user_id",             limit: 4,                     null: false
+    t.integer  "hours",               limit: 4,     default: 0
+    t.text     "conflictingstudents", limit: 65535
   end
 
   create_table "courses", force: :cascade do |t|
@@ -224,6 +233,7 @@ ActiveRecord::Schema.define(version: 20170101140555) do
     t.datetime "updated_at"
     t.boolean  "released",      limit: 1,        default: false
     t.integer  "grader_id",     limit: 4
+    t.float    "MAXSCORE",      limit: 24,       default: 0.0
   end
 
   add_index "scores", ["problem_id", "submission_id"], name: "problem_submission_unique", unique: true, using: :btree
@@ -251,10 +261,11 @@ ActiveRecord::Schema.define(version: 20170101140555) do
     t.string   "detected_mime_type",        limit: 255
     t.string   "submitter_ip",              limit: 40
     t.integer  "tweak_id",                  limit: 4
-    t.boolean  "ignored",                   limit: 1,     default: false, null: false
+    t.boolean  "ignored",                   limit: 1,     default: false,        null: false
     t.string   "dave",                      limit: 255
     t.text     "settings",                  limit: 65535
     t.text     "embedded_quiz_form_answer", limit: 65535
+    t.string   "grader",                    limit: 255,   default: "Unassigned"
   end
 
   add_index "submissions", ["assessment_id"], name: "index_submissions_on_assessment_id", using: :btree
@@ -283,6 +294,7 @@ ActiveRecord::Schema.define(version: 20170101140555) do
     t.string   "school",                 limit: 255
     t.string   "major",                  limit: 255
     t.string   "year",                   limit: 255
+    t.integer  "person_number",          limit: 4
   end
 
   add_index "users", ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree
