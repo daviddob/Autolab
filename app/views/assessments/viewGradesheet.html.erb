@@ -1,3 +1,7 @@
 <% @title = "View Gradesheet" %>
+<% if @assessment.assignCA then %>
+<%= render :partial=>"assigned", :locals => { :students => @students }, :layout => false %>
+<% else %>
 <%= render :partial=>"gradesheet", :locals => { :students => @students }, :layout => false %>
+<% end %>
 

@@ -30,6 +30,22 @@
       }
     }
   </script>
+  <script type="text/javascript">
+    function tavalidation(){
+      var checkbox = document.getElementById('course_user_datum_course_assistant');
+      var moreOptions = document.getElementById('moreOptions');
+      var showMoreOptions = function(){
+        if(checkbox.checked) {
+          moreOptions.style['display'] = 'block';
+        } else {
+          moreOptions.style['display'] = 'none';
+        }
+      }
+      checkbox.onclick = showMoreOptions;
+      showMoreOptions();
+    };
+    tavalidation();
+  </script>
 <% end %>
 
 <%= form_for @editCUD, url: course_course_user_datum_path(@course, @editCUD) do |f| %>
@@ -92,8 +108,12 @@
   <tr><th>Instructor?</th><td><%= f.check_box :instructor %><label for="course_user_datum_instructor"></label></td>
   <td class="smallText">Instructors have full read/write access to the course. </td></tr>
 
-  <tr><th>Course assistant?</th><td><%= f.check_box :course_assistant %><label for="course_user_datum_course_assistant"></label></td>
+  <tr><th>Course assistant?</th><td onclick="tavalidation();"><%= f.check_box :course_assistant %><label for="course_user_datum_course_assistant"></label></td>
   <td class="smallText">Course assistants can assign scores to problems and nothing else.</td></tr>
+  <tr><th></th>
+  <td></td>
+  <td class = "smallText"><div id = "moreOptions" style="display:none">Add the emails of the students (separate by comma) that have a conflict of interest with this CA. Manually graded submissions from these students will not be assigned to this CA. <%= f.text_field :conflictingstudents, :size => 75%>Add the number of hours the CA works per week. </br><%= f.text_field :hours%></div></td>
+  </tr>
   <% end %>
 
   </table>

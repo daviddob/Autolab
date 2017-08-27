@@ -62,6 +62,14 @@
               <li> <%= link_to "Bulk import grades", {:action => "bulkGrade" }, {:title=> "Upload scores or feedback for multiple students from a CSV file" } %></li>
               <li> <%= link_to "Bulk export grades", {:action => "bulkExport" }, {:title=> "Export grades (with sub-scores) \nfor all students to a CSV file" } %></li>
               
+              <% if !@assessment.has_autograder? and @assessment.is_due? then %>
+                <% if !@assessment.assignCA then %>
+                  <li><%= link_to "Assign CAs", {:action => "assignCA"}, {:title=> "Assign CAs for manual grading"} %></li>
+                <% else %>
+                  <li><%= link_to "Unassign CAs", {:action => "unassignCA"}, {:title=> "Clear assignments for CAs"} %></li>
+                <% end %>
+              <% end %>
+
               <li class="collection-item blue-text danger-bottom no-hover"><h4>Danger Zone</h4></li>
               
               <li class="danger-side"> 
