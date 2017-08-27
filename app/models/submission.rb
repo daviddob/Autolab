@@ -106,6 +106,13 @@ class Submission < ActiveRecord::Base
     elsif upload["tar"]
       self.mime_type = "application/x-tgz"
     end
+
+    if assessment.has_autograder?
+      self.grader = "Autolab"
+    else
+      self.grader = "Unassigned"
+    end
+
     save_additional_form_fields(upload)
     self.save!
     settings_file = course_user_datum.user.email + "_" +
@@ -151,6 +158,11 @@ class Submission < ActiveRecord::Base
       else
           return Hash.new
       end
+  end
+
+  def set_grader(grader)
+    self.grader = grader
+    self.save!
   end
 
   def archive_handin

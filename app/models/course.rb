@@ -151,6 +151,10 @@ class Course < ActiveRecord::Base
     course_user_data.where(instructor: true)
   end
 
+  def course_assistants
+    course_user_data.where(course_assistant: true)
+  end
+
   def assessment_categories
     assessments.pluck("DISTINCT category_name").sort
   end

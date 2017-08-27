@@ -94,6 +94,8 @@ Autolab3::Application.routes.draw do
         get "history"
         get "viewGradesheet"
         get "writeup"
+        get "assignCA"
+        get "unassignCA"
         get "handout"
 
         # autograde actions

@@ -207,12 +207,12 @@ private
   def cud_params
     if @cud.administrator?
       params.require(:course_user_datum).permit(:school, :major, :year,
-                                                :lecture, :section, :instructor, :dropped, :nickname, :course_assistant,
+                                                :lecture, :section, :instructor, :dropped, :nickname, :course_assistant, :conflictingstudents, :hours,
                                                 user_attributes: [:first_name, :last_name, :email],
                                                 tweak_attributes: [:_destroy, :kind, :value])
     elsif @cud.instructor?
       params.require(:course_user_datum).permit(:school, :major, :year,
-                                                :lecture, :section, :instructor, :dropped, :nickname, :course_assistant,
+                                                :lecture, :section, :instructor, :dropped, :nickname, :course_assistant, :conflictingstudents, :hours,
                                                 user_attributes: [:email, :first_name, :last_name],
                                                 tweak_attributes: [:_destroy, :kind, :value])
     else

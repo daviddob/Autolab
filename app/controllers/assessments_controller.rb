@@ -516,6 +516,112 @@ class AssessmentsController < ApplicationController
     redirect_to(action: :show) && return
   end
 
+  action_auth_level :viewAssigned, :course_assistant
+  def viewAssigned
+    
+    redirect_to(action: "viewGradesheet") && return
+  end
+                     
+  
+  action_auth_level :unassignCA, :instructor
+  def unassignCA
+      for submission in @assessment.submissions do
+          submission.set_grader("Unassigned")
+      end
+      @assessment.assignCA = false
+      @assessment.save!
+      flash[:success] = "Success: Submissions have no assigned graders."
+      redirect_to(action: :show) && return
+  end
+                     
+  action_auth_level :assignCA, :instructor
+  def assignCA
+    conflicts = {}
+    hours = {}
+    course_assistants = @course.course_assistants
+    for course_assistant in course_assistants do
+        if !course_assistant.conflictingstudents.nil?
+             conflicts[course_assistant] = course_assistant.conflictingstudents.split(/\s*,\s*/)
+        else
+             conflicts[course_assistant] = []
+        end
+        if !course_assistant.hours.nil?
+             hours[course_assistant] = course_assistant.hours
+        else
+             hours[course_assistant] = 0
+        end
+    end
+    bestSolution = -1
+    bestAssignment = {}
+    totalHours = 0
+    badnessAcrossSolutions = []
+    for course_assistant in course_assistants do
+        totalHours += hours[course_assistant]
+    end
+    if totalHours == 0
+        flash[:error] = "All the CAs work 0 hours per week. Aborting."
+        redirect_to([@course, @assessment, :submissions])
+        return;
+    end
+    for i in 0..30 do
+        r = Random.new
+        assignments = {}
+        for course_assistant in course_assistants do
+            assignments[course_assistant] = []
+        end
+        for submission in @assessment.submissions.latest do
+            canGrade = []
+             for course_assistant in course_assistants do
+                 if !conflicts[course_assistant].include? submission.course_user_datum.user.email
+                   canGrade.push(course_assistant)
+                 end
+             end
+             probabilityBalancing = []
+             for course_assistant in canGrade do
+                 for i in 1..hours[course_assistant] do
+                     probabilityBalancing.push(course_assistant)
+                 end
+             end
+             if probabilityBalancing.length != 0
+                choice = r.rand(0...probabilityBalancing.length)
+                assignments[probabilityBalancing[choice]].push(submission.course_user_datum)
+             end
+        end
+        badness = []
+        assignments.each do |course_assistant, assignments|
+            idealSubmissions = hours[course_assistant].to_f/totalHours
+            badnessta = ((idealSubmissions*@assessment.submissions.latest.count - assignments.count).round).abs
+            badness.push(badnessta)
+        end
+        badnessSolution = badness.max
+        badnessAcrossSolutions.push(badnessSolution)
+        if bestSolution == -1 || badnessSolution < bestSolution
+            bestSolution = badnessSolution
+            bestAssignment = assignments
+        end
+    end
+    s = {}
+    bestAssignment.each do |course_assistant, assignments|
+            s[course_assistant.user.email] = []
+        for student in assignments do
+            s[course_assistant.user.email].push(student.user.email)
+        end
+    end
+    studentGrader = {}
+    bestAssignment.each do |course_assistant, assignments|
+        for student in assignments do
+            studentGrader[student] = course_assistant
+        end
+    end
+    for submission in @assessment.submissions.latest do
+        submission.set_grader(studentGrader[submission.course_user_datum].user.email)
+    end
+    flash[:success] = badnessAcrossSolutions.to_s + " Badness: #{bestSolution}"
+    @assessment.assignCA = true
+    @assessment.save!
+    redirect_to([@course, @assessment, :submissions])
+  end
+
   action_auth_level :edit, :instructor
   def edit
     # default to the basic tab
