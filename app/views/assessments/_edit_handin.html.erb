@@ -64,5 +64,8 @@ function adjustDates(){
   if(new Date($("#assessment_start_at").attr('value')).getTime() > new Date($("#assessment_end_at").attr('value')).getTime()){
     $("#assessment_end_at").flatpickr({enableTime: true,altInput: true}).setDate(new Date($("#assessment_start_at").attr('value')).getTime() + (3600000 * 2));
   }
+  if(new Date($("#assessment_end_at").attr('value')).getTime() > new Date($("#assessment_due_at").attr('value')).getTime()){
+    $("#assessment_end_at").flatpickr({enableTime: true,altInput: true}).setDate(new Date($("#assessment_due_at").attr('value')).getTime() + (3600000 * 2));
+  }
 }
 </script>
