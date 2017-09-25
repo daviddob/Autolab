@@ -123,6 +123,8 @@ class Assessment < ActiveRecord::Base
     temp = temp - self.end_offset * 60
     # abort temp.strftime("%Y-%m-%d %X").inspect
     self.due_at = temp.strftime("%Y-%m-%d %X")
+    temp = temp + 1
+    self.end_at = temp.strftime("%Y-%m-%d %X")
 
     temps = ((self.base_section_day-day_array[self.base_section_day.strftime("%A")]) + day_array[( day_array[section.start.strftime("%A")] != 0) ? section.start.strftime("%A") : (self.on_day?) ? section.start.strftime("%A") : "nextWeek"]).to_time
     temps = temps + section.start.to_time.hour * 60 * 60
