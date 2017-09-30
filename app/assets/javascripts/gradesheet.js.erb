@@ -7,7 +7,7 @@ jQuery(function() {
     var current_editor = undefined;
     var current_popover = undefined;
 
-    var num_cols = jQuery("table#grades > thead > tr:first > th").length
+    var num_cols = columns.length
 
     numeric_columns = []
     for (var i = first_problem_column; i < num_cols; i++)
@@ -22,36 +22,24 @@ jQuery(function() {
           'X-CSRF-Token' : $('meta[name="csrf-token"]').attr('content')
       },
     });
-    // fast numeric-html sorts (but --'s aren't sorted correctly)
-    jQuery.extend(jQuery.fn.dataTableExt.oSort, {
-      "num-html-pre": function (a) {
-        return parseFloat(String(a).replace(/<[\s\S]*?>/g, ""));
-      },
-   
-      "num-html-asc": function ( a, b ) {
-        a_nan = isNaN(a);
-        b_nan = isNaN(b);
-        if (a_nan) {
-          if (b_nan) { return 0; } else { return -1; }
-        } else {
-          if (b_nan) { return 1; } else {
-            return ((a < b) ? -1 : ((a > b) ? 1 : 0));
-          }
-        }
-      },
-   
-      "num-html-desc": function ( a, b ) {
-        a_nan = isNaN(a);
-        b_nan = isNaN(b);
-        if (a_nan) {
-          if (b_nan) { return 0; } else { return 1; }
-        } else {
-          if (b_nan) { return -1; } else {
-            return ((a > b) ? -1 : ((a < b) ? 1 : 0));
-          }
-        }
-      }
-    } );
+
+    _anyNumberSort = function(a, b, high) {
+    var reg = /[+-]?((\d+(\.\d*)?)|\.\d+)([eE][+-]?[0-9]+)?/;       
+    a = a.replace(',','.').match(reg);
+    a = a !== null ? parseFloat(a[0]) : high;
+    b = b.replace(',','.').match(reg);
+    b = b !== null ? parseFloat(b[0]) : high;
+    return ((a < b) ? -1 : ((a > b) ? 1 : 0));   
+}
+ 
+jQuery.extend( jQuery.fn.dataTableExt.oSort, {
+    "any-number-asc": function (a, b) {
+        return _anyNumberSort(a, b, Number.POSITIVE_INFINITY);
+    },
+    "any-number-desc": function (a, b) {
+        return _anyNumberSort(a, b, Number.NEGATIVE_INFINITY) * -1;
+    }
+});
 
     // from http://www.datatables.net/plug-ins/api. ugly, but for now...
     jQuery.fn.dataTableExt.oApi.fnSetFilteringDelay = function ( oSettings, iDelay ) {
@@ -143,7 +131,7 @@ jQuery(function() {
           { "bSortable": false, "aTargets": [ 0 ] },
           { "bSearchable": false, "aTargets": non_searchable_columns },
           { "sType": "html", "aTargets": [ email_col ] },
-          { "sType": "num-html", "aTargets": numeric_columns }, 
+          { "sType": "any-number", "aTargets": numeric_columns }, 
         ],
         'columns' : columns,
         'createdRow' : completeRow,
