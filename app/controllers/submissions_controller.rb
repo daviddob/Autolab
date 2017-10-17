@@ -104,7 +104,7 @@ class SubmissionsController < ApplicationController
   action_auth_level :destroy, :instructor
   def destroy
     if params[:yes]
-      # @submission.destroy!
+      @submission.destroy!
     else
       flash[:error] = "There was an error deleting the submission."
     end
