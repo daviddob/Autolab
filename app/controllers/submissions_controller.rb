@@ -104,11 +104,15 @@ class SubmissionsController < ApplicationController
   action_auth_level :destroy, :instructor
   def destroy
     if params[:yes]
-      @submission.destroy!
+      # @submission.destroy!
     else
       flash[:error] = "There was an error deleting the submission."
     end
-    redirect_to(course_assessment_submissions_path(@submission.course_user_datum.course, @submission.assessment)) && return
+    if params['from']
+      redirect_to(history_course_assessment_path(@submission.course_user_datum.course, @submission.assessment.name, :cud_id => @cud.id.to_s)) && return
+    else
+      redirect_to(course_assessment_submissions_path(@submission.course_user_datum.course, @submission.assessment)) && return
+    end
   end
 
   # this is good
