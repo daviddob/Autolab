@@ -109,7 +109,7 @@ class SubmissionsController < ApplicationController
       flash[:error] = "There was an error deleting the submission."
     end
     if params['from']
-      redirect_to(history_course_assessment_path(@submission.course_user_datum.course, @submission.assessment.name, :cud_id => @cud.id.to_s)) && return
+      redirect_to(history_course_assessment_path(@submission.course_user_datum.course, @submission.assessment.name, :cud_id => params['from'].to_s)) && return
     else
       redirect_to(course_assessment_submissions_path(@submission.course_user_datum.course, @submission.assessment)) && return
     end
