@@ -160,4 +160,4 @@ Autolab is released under the [Apache License 2.0](http://opensource.org/license
 
 ## Using Autolab
 
-Please feel free to use Autolab at your school/organization. If you run into any problems, you can reach the core developers at `autolab-dev@andrew.cmu.edu` or `autolab-dev-list@listserv.buffalo.edu` and we would be happy to help. On a case by case basis, we also provide servers for free. (Especially if you are an NGO or small high-school classroom)
+Please feel free to use Autolab at your school/organization. If you run into any problems, you can reach the core developers at `autolab-dev-list@listserv.buffalo.edu`or `autolab-dev@andrew.cmu.edu` and we would be happy to help.
