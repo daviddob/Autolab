@@ -176,6 +176,8 @@ class AssessmentUserDatum < ActiveRecord::Base
     assessment.deal_with_section_for_user(submitter)
     if submitter.instructor?
       [true, nil]
+    elsif submitter.course_assistant?
+      [true, nil]
     elsif course_user_datum.dropped? # TODO: why not submitter?
       [false, :user_dropped]
     elsif at < assessment.start_at
