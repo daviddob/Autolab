@@ -191,7 +191,7 @@ class SubmissionsController < ApplicationController
                 filename: pathname,
                 disposition: "inline"
     
-    elsif params[:annotated]
+    elsif params[:annotated] && @submission.assessment.grading_deadline.past?
 
       @filename_annotated = @submission.handin_annotated_file_path
       @basename_annotated = File.basename @filename_annotated
