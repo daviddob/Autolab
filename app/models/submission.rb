@@ -148,6 +148,8 @@ class Submission < ActiveRecord::Base
           form_hash["section_id"] = CourseUserDatum.find(self.course_user_datum_id).section
         end
       end
+
+      form_hash["hartloff_hack_section_id"] = CourseUserDatum.find(self.course_user_datum_id).section
       self.settings = form_hash.to_json
       self.save!
   end
