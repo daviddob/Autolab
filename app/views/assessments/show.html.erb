@@ -40,7 +40,7 @@
             <ul class="options">
               <li> <%= link_to "Edit assessment", {:action => "edit" }, {:title=> "View and modify the properties for this assessment, including its problems", :class=>""} %></li>
               <li> <%= link_to "Grade submissions", {:action => "viewGradesheet" }, {:title=> "View and enter grades on the gradesheet" } %></li>
-              <li> <%= link_to "Export assessment", {:action => "export" }, {:title=> "Export persistent properties that will be imported when you install this assessment in a future term" } %></li>
+              </li>
               <% if @assessment.has_svn then %>
                 <li><%= link_to "SVN settings", [:admin_svn, @course, @assessment], title: "Manage the SVN repositories" %></li>
               <% end %>
