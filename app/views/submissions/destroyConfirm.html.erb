@@ -4,7 +4,7 @@
   <h2>Destroy <%= @submission.course_user_datum.email %>'s Submission
 #<%=@submission.version%> for <%= @submission.assessment.display_name %></h2>
   <b>This will destroy their submission and scores.  This cannot be undone!</b>
-  <%= form_tag(course_assessment_submission_path(@course, @assessment, @submission), method: :delete) %>
+  <%= form_tag(course_assessment_submission_path(@course, @assessment, @submission, :from => params['from']), method: :delete) %>
   <br>
   <%= check_box_tag "yes", class: "filled-in" %>   
   <label for="yes">Yes! Destroy this submission!</label>

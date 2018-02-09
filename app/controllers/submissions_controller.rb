@@ -108,7 +108,11 @@ class SubmissionsController < ApplicationController
     else
       flash[:error] = "There was an error deleting the submission."
     end
-    redirect_to(course_assessment_submissions_path(@submission.course_user_datum.course, @submission.assessment)) && return
+    if params['from']
+      redirect_to(history_course_assessment_path(@submission.course_user_datum.course, @submission.assessment.name, :cud_id => params['from'].to_s)) && return
+    else
+      redirect_to(course_assessment_submissions_path(@submission.course_user_datum.course, @submission.assessment)) && return
+    end
   end
 
   # this is good
@@ -187,7 +191,7 @@ class SubmissionsController < ApplicationController
                 filename: pathname,
                 disposition: "inline"
     
-    elsif params[:annotated]
+    elsif params[:annotated] && @submission.assessment.grading_deadline.past?
 
       @filename_annotated = @submission.handin_annotated_file_path
       @basename_annotated = File.basename @filename_annotated
