@@ -335,40 +335,41 @@ class AssessmentsController < ApplicationController
   # properties in a yaml properties file.
   action_auth_level :export, :instructor
   def export
-    base_path = Rails.root.join("courses", @course.name).to_s
-    asmt_dir = @assessment.name
-    begin
-      # Update the assessment config YAML file.
-      @assessment.dump_yaml
-      # Pack assessment directory into a tarball.
-      tarStream = StringIO.new("")
-      Gem::Package::TarWriter.new(tarStream) do |tar|
-        tar.mkdir asmt_dir, File.stat(File.join(base_path, asmt_dir)).mode
-        Dir[File.join(base_path, asmt_dir, "**")].each do |file|
-          mode = File.stat(file).mode
-          relative_path = file.sub((/^#{Regexp.escape base_path}\/?/), "")
 
-          if File.directory?(file)
-            tar.mkdir relative_path, mode
-          elsif !relative_path.starts_with? File.join(@assessment.name, @assessment.handin_directory)
-            tar.add_file relative_path, mode do |tarFile|
-              File.open(file, "rb") { |f| tarFile.write f.read }
-            end
-          end
-        end
-      end
-      tarStream.rewind
-      tarStream.close
-      send_data tarStream.string.force_encoding("binary"), filename: "#{@assessment.name}_#{Time.now.strftime('%Y%m%d')}.tar", content_type: "application/x-tar"
-    rescue SystemCallError => e
-      flash[:error] = "Unable to update the config YAML file: #{e}"
-      redirect_to action: "index"
-    rescue StandardError => e
-      flash[:error] = "Unable to generate tarball -- #{e.message}"
-      redirect_to action: "index"
-    else
-      flash[:success] = "Successfully exported the assessment."
-    end
+    # base_path = Rails.root.join("courses", @course.name).to_s
+    # asmt_dir = @assessment.name
+    # begin
+    #   # Update the assessment config YAML file.
+    #   @assessment.dump_yaml
+    #   # Pack assessment directory into a tarball.
+    #   tarStream = StringIO.new("")
+    #   Gem::Package::TarWriter.new(tarStream) do |tar|
+    #     tar.mkdir asmt_dir, File.stat(File.join(base_path, asmt_dir)).mode
+    #     Dir[File.join(base_path, asmt_dir, "**")].each do |file|
+    #       mode = File.stat(file).mode
+    #       relative_path = file.sub((/^#{Regexp.escape base_path}\/?/), "")
+
+    #       if File.directory?(file)
+    #         tar.mkdir relative_path, mode
+    #       elsif !relative_path.starts_with? File.join(@assessment.name, @assessment.handin_directory)
+    #         tar.add_file relative_path, mode do |tarFile|
+    #           File.open(file, "rb") { |f| tarFile.write f.read }
+    #         end
+    #       end
+    #     end
+    #   end
+    #   tarStream.rewind
+    #   tarStream.close
+    #   send_data tarStream.string.force_encoding("binary"), filename: "#{@assessment.name}_#{Time.now.strftime('%Y%m%d')}.tar", content_type: "application/x-tar"
+    # rescue SystemCallError => e
+    #   flash[:error] = "Unable to update the config YAML file: #{e}"
+    #   redirect_to action: "index"
+    # rescue StandardError => e
+    #   flash[:error] = "Unable to generate tarball -- #{e.message}"
+    #   redirect_to action: "index"
+    # else
+    #   flash[:success] = "Successfully exported the assessment."
+    # end
   end
 
   action_auth_level :destroy, :instructor
