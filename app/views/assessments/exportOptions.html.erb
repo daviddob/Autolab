@@ -1,0 +1,7 @@
+<% @title = "Export" %>
+<h2 id="exportHeading">Export Options For <%= link_to @assessment.display_name, course_assessment_path(@course, @assessment) %></h2>
+<div class="action_buttons">
+<%= button_to "Export Autograder Files", export_course_assessment_path,
+{ method: :post, params: {:files_wanted => "autograde"},
+ :class=>(@assessment.has_autograder?) ? "btn primary": "btn disabled"} %>
+</div>
