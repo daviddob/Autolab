@@ -375,11 +375,11 @@ def exportEverything
       tarStream.close
       send_data tarStream.string.force_encoding("binary"), filename: "#{@assessment.name}_#{Time.now.strftime('%Y%m%d')}.tar", content_type: "application/x-tar"
     rescue SystemCallError => e
-      flash[:error] = "Unable to update the config YAML file: #{e}"
-      redirect_to action: "exportOptions" && return
+      flash[:error] = "Unable to generate tarball -- #{e.message}"
+      redirect_to(export_course_assessment_path(@course,@assessment)) && return
     rescue StandardError => e
       flash[:error] = "Unable to generate tarball -- #{e.message}"
-      redirect_to action: "exportOptions" && return 
+      redirect_to(export_course_assessment_path(@course,@assessment)) && return 
     else
 
     end
@@ -395,7 +395,6 @@ def exportEverything
         autoTar = File.join(base_path, asmt_dir,"autograde.tar")
         autoMake = File.join(base_path, asmt_dir,"autograde-Makefile")
 
-
         tar.add_file "autograde.tar", File.stat(autoTar).mode do |tarFile|
               File.open(autoTar, "rb") { |f| tarFile.write f.read }
         end
@@ -409,11 +408,13 @@ def exportEverything
       tarStream.close
       send_data tarStream.string.force_encoding("binary"), filename: "#{@assessment.name}_autograder_files_#{Time.now.strftime('%Y%m%d')}.tar", content_type: "application/x-tar"
     rescue SystemCallError => e
-      flash[:error] = "Unable to update the config YAML file: #{e}"
-      redirect_to action: "exportOptions" && return
+      flash[:error] = "Unable to generate tarball -- #{e.message}"
+      redirect_to(export_course_assessment_path(@course,@assessment)) && return
     rescue StandardError => e
       flash[:error] = "Unable to generate tarball -- #{e.message}"
-      redirect_to action: "exportOptions" && return 
+      redirect_to(export_course_assessment_path(@course,@assessment)) && return 
+
+
     else
 
     end
