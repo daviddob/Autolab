@@ -376,10 +376,10 @@ def exportEverything
       send_data tarStream.string.force_encoding("binary"), filename: "#{@assessment.name}_#{Time.now.strftime('%Y%m%d')}.tar", content_type: "application/x-tar"
     rescue SystemCallError => e
       flash[:error] = "Unable to generate tarball -- #{e.message}"
-      redirect_to(export_course_assessment_path(@course,@assessment)) && return
+      redirect_to(:action => 'exportOptions') && return
     rescue StandardError => e
       flash[:error] = "Unable to generate tarball -- #{e.message}"
-      redirect_to(export_course_assessment_path(@course,@assessment)) && return 
+      redirect_to(:action => 'exportOptions') && return 
     else
 
     end
@@ -409,10 +409,10 @@ def exportEverything
       send_data tarStream.string.force_encoding("binary"), filename: "#{@assessment.name}_autograder_files_#{Time.now.strftime('%Y%m%d')}.tar", content_type: "application/x-tar"
     rescue SystemCallError => e
       flash[:error] = "Unable to generate tarball -- #{e.message}"
-      redirect_to(export_course_assessment_path(@course,@assessment)) && return
+      redirect_to(:action => 'exportOptions') && return
     rescue StandardError => e
       flash[:error] = "Unable to generate tarball -- #{e.message}"
-      redirect_to(export_course_assessment_path(@course,@assessment)) && return 
+      redirect_to(:action => 'exportOptions') && return 
 
 
     else
