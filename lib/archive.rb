@@ -76,7 +76,7 @@ module Archive
   def self.archive?(filename)
     return nil unless filename
     archive_type = get_archive_type(filename)
-    (archive_type.include?("tar") || archive_type.include?("gzip") || archive_type.include?("zip"))
+    (archive_type.include?("tar") || archive_type.include?("gzip") || archive_type.include?("zip") || archive_type.include?("java-archive"))
   end
 
   def self.get_archive(filename, archive_type = nil)
@@ -89,6 +89,8 @@ module Archive
       archive_extract = Gem::Package::TarReader.new(Zlib::GzipReader.open(filename))
       archive_extract.rewind
     elsif archive_type.include? "zip"
+      archive_extract = Zip::File.open(filename)
+    elsif archive_type.include? "java-archive"
       archive_extract = Zip::File.open(filename)
     else
       fail "Unrecognized archive type!"
