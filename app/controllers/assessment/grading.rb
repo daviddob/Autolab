@@ -462,9 +462,8 @@ private
       problem_stats[:Total] = stats.stats(problem_scores[:total])
       result[group] = {}
       result[group][:data] = problem_stats
-      result[group][:total_students] =problem_scores[ problem_scores.keys[1]].length
+      result[group][:total_students] =problem_scores[:total].length
     end
-    # raise result.inspect
     result
   end
 
