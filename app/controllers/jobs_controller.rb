@@ -134,14 +134,12 @@ class JobsController < ApplicationController
       # We don't have any information about which problems were
       # autograded, so search each problem until we find one
       # that has autograder feedback and save it for the view.
-      i = 0
       feedback_num = 0
       @feedback_str = ""
       scores.each do |score|
-        i += 1
         next unless score.feedback && score.feedback["Autograder"]
         @feedback_str = score.feedback
-        feedback_num = i
+        feedback_num = score.problem_id
         break
       end
     end
@@ -216,7 +214,7 @@ protected
         job[:name] = "*" unless job[:name][@cud.user.email]
       else
         # Instructors can see only their course's job names
-        job[:name] = "*" if !rjob["notifyURL"] || !(job[:course].eql? @cud.course.id.to_s)
+        job[:name] = "*" if !rjob["notifyURL"] || !(job[:course].eql? @cud.course.name.to_s)
       end
     end
 
