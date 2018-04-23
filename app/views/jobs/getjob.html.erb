@@ -2,6 +2,10 @@
   <%= javascript_include_tag "sorttable" %>
 <% end %>
 
+
+<% if@job[:name] == "*" then %>
+<h3>You are trying to view a job for the course: <span style="color:red"><%= @job[:course]%></span><br/> you are not in this course, If you think this is an error, try again in a few seconds.</h3>
+<% else %>
 <h1>Job <%= @job[:name]%></h1>
 <p>
 <%= link_to "Return to Jobs", {:action=>"index"} %>
@@ -52,4 +56,5 @@
   <pre>No Feedback Available</pre>
 <% else %>
   <pre><%= @feedback_str %></pre>
+<% end %>
 <% end %>
