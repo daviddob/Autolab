@@ -10,7 +10,7 @@
   
   <script type="application/javascript">
     jQuery(function() {
-      $dueDate = moment("<%= @assessment.due_at.to_s %>", "YYYY-MM-DD hh:mm:ss ZZ").startOf('day');
+      $dueDate = moment("<%= @assessment.due_at.to_s %>", "YYYY-MM-DD hh:mm:ss ZZ");
 
       $extensionDaysField = $('#extension_days');
       $extensionNewDayField = $('#extension_due_at');
@@ -34,21 +34,8 @@
         }
       });
 
-      /* two-way-bind newDayField with daysField */
-      $extensionDaysField.on('change', function() {
-        $newDate = moment($dueDate);
-        $newDate.add($extensionDaysField.val(), 'days').startOf('day');
-        $extensionNewDayField.flatpickr().setDate($newDate.toDate());
-      });
-      $extensionNewDayField.on('change', function() {
-        $newDate = moment($extensionNewDayField.val()).startOf('day');
-        $extendBy = $newDate.diff($dueDate, 'days');
-        $extensionDaysField.val($extendBy);
-        $extensionDaysLabel.addClass("active");
-      });
-
       /* set initial value to original due date */
-      $extensionNewDayField.flatpickr().setDate($dueDate.toDate());
+      $extensionNewDayField.flatpickr({enableTime: true}).setDate($dueDate.toDate());
     });
   </script>
 
@@ -69,7 +56,7 @@
       <thead>
         <tr>
           <th>Email</th>
-          <th colspan=2>Length</th>
+          <th colspan=2>New Due Date</th>
         </tr>
       </thead>
 
@@ -99,9 +86,7 @@
         <% end %>
         <%= f.select(:course_user_datum_id, @users.sort, {prompt: 'select user'}, {class: ''}) %>
         <p>Select a new due date</p>
-        <%= f.date_select :due_at, greater_than: @assessment.due_at, id: "extension_due_at" %><br>
-        <p>-OR- Specify number of days to extend:</p>
-        <%= f.text_field :days, :size=>3, :id => "extension_days" %>
+        <%= f.datetime_select :due_at, id: "extension_due_at" %><br>
         <p>-OR- Infinite Extension? <%= f.check_box :infinite, id: "extension_infinite" %></p>
         <%= f.hidden_field(:assessment_id)%>
         <%= f.submit "Create" , {:class=>"btn primary"} %>
