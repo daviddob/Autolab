@@ -62,9 +62,11 @@
 
       <tbody>
         <% for ext in @extensions do %>
+        <% convertedTime = DateTime.strptime(ext.due_at.to_s,'%s') %>
+        <% newDate =  convertedTime.strftime("%B #{convertedTime.day.ordinalize} %Y, %-l:%M %P") %>
           <tr>
             <th><%= ext.course_user_datum.email %></th>
-            <td style="padding: 0 5px"><%= ext.infinite? ? "Infinite" : "#{ext.days} days" %></td>
+            <td style="padding: 0 5px"><%= ext.infinite? ? "Infinite" : "#{newDate}" %></td>
             <td><%= link_to '<i class="material-icons">delete</i>'.html_safe, [@course, @assessment, ext], method: :delete %></td>
           </tr>
         <% end %>
@@ -86,7 +88,7 @@
         <% end %>
         <%= f.select(:course_user_datum_id, @users.sort, {prompt: 'select user'}, {class: ''}) %>
         <p>Select a new due date</p>
-        <%= f.datetime_select :due_at, id: "extension_due_at" %><br>
+        <%= f.datetime_select :due_at , id: "extension_due_at" %><br>
         <p>-OR- Infinite Extension? <%= f.check_box :infinite, id: "extension_infinite" %></p>
         <%= f.hidden_field(:assessment_id)%>
         <%= f.submit "Create" , {:class=>"btn primary"} %>

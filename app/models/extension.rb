@@ -7,11 +7,12 @@ class Extension < ActiveRecord::Base
                                                  message: "already has an extension."
 
   after_save :invalidate_cgdubs_for_assessments_after
-  after_destroy :invalidate_cgdubs_for_assessments_after
+  after_destroy :invalidate_cgdubs_for_assessments_after,:after_destroy_log
+  after_create :after_create_log
 
   def days_or_infinite
-    if days.blank? && !infinite?
-      errors.add(:base, "Please enter days of extension, or mark as infinite.")
+    if due_at.blank? && !infinite?
+      errors.add(:base, "Please enter new due date of extension, or mark as infinite.")
     end
   end
 
@@ -19,7 +20,7 @@ class Extension < ActiveRecord::Base
     assessment.aud_for(course_user_datum_id).invalidate_cgdubs_for_assessments_after
   end
 
-  def after_create
+  def after_create_log
     if self.infinite?
       COURSE_LOGGER.log("Extension #{id}: CREATED for " \
       "#{course_user_datum.user.email} on" \
@@ -27,11 +28,11 @@ class Extension < ActiveRecord::Base
     else
       COURSE_LOGGER.log("Extension #{id}: CREATED for " \
       "#{course_user_datum.user.email} on" \
-      " #{assessment.name} for #{days} days")
+      " #{assessment.name} which is now due at #{due_at}")
     end
   end
 
-  def after_destroy
+  def after_destroy_log
     COURSE_LOGGER.log("Extension #{id}: DESTROYED for " \
     "#{course_user_datum.user.email} on" \
       " #{assessment.name}")

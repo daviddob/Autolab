@@ -30,8 +30,10 @@ class ExtensionsController < ApplicationController
         was found for this course."
       redirect_to(action: :index) && return
     end
-    ext = @assessment.extensions.create(extension_params)
-    redirect_to(action: :index, errors: ext.errors.full_messages) && return
+    e_params = extension_params
+    e_params[:due_at] = DateTime.parse(e_params[:due_at]).to_i
+    ext = @assessment.extensions.create(e_params)
+    redirect_to(action: :index, errors: ext.errors.full_messages.join("<br/>")) && return
   end
 
   action_auth_level :destroy, :instructor
@@ -44,7 +46,7 @@ class ExtensionsController < ApplicationController
 private
 
   def extension_params
-    params.require(:extension).permit(:course_user_datum_id, :days, :infinite,
+    params.require(:extension).permit(:course_user_datum_id, :due_at, :infinite,
                                       :commit, :course_id, :assessment_id)
   end
 end
