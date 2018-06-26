@@ -248,8 +248,7 @@ private
   # Returns nil, if extension is infinite and thus the date limit is void.
   def apply_extension(original_date, ext)
     if ext
-      abort original_date.class.inspect
-      ext.infinite? ? nil : (original_date + ext.days.days)
+      ext.infinite? ? nil :  DateTime.strptime(ext.due_at.to_s, "%s")
     else
       original_date
     end

@@ -31,9 +31,13 @@ class ExtensionsController < ApplicationController
       redirect_to(action: :index) && return
     end
     e_params = extension_params
-    e_params[:due_at] = DateTime.parse(e_params[:due_at]).to_i
+    e_params[:due_at] = DateTime.parse(e_params[:due_at]).strftime("%s")
     ext = @assessment.extensions.create(e_params)
-    redirect_to(action: :index, errors: ext.errors.full_messages.join("<br/>")) && return
+    if ext.errors.messages.blank?
+      redirect_to(action: :index) && return
+    else
+      redirect_to(action: :index, errors: ext.errors.full_messages) && return
+    end
   end
 
   action_auth_level :destroy, :instructor
