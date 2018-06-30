@@ -55,7 +55,7 @@
     <table class="verticalTable">
       <thead>
         <tr>
-          <th>Email</th>
+          <th>Email/Section</th>
           <th colspan=2>New Due Date</th>
         </tr>
       </thead>
@@ -65,7 +65,7 @@
         <% convertedTime = DateTime.strptime(ext.due_at.to_s,'%s') %>
         <% newDate =  convertedTime.strftime("%B #{convertedTime.day.ordinalize} %Y, %-l:%M %P") %>
           <tr>
-            <th><%= ext.course_user_datum.email %></th>
+            <th><%= ext.course_user_datum.nil? ? ext.assessment.course.sections.find(ext.section_id).name : ext.course_user_datum.email %></th>
             <td style="padding: 0 5px"><%= ext.infinite? ? "Infinite" : "#{newDate}" %></td>
             <td><%= link_to '<i class="material-icons">delete</i>'.html_safe, [@course, @assessment, ext], method: :delete %></td>
           </tr>
@@ -76,6 +76,7 @@
 
   <div class="col s12 m6">
     <p><b>Create New Extension</b></p>
+      <p> Select A User </p>
       <%= form_for @new_extension, :as=>"extension", :url=>{:action=>"create"}, builder: FormBuilderWithDateTimeInput do |f| %>
         <% if @new_extension.errors.any? %>
           <div>
@@ -87,6 +88,8 @@
           </div>
         <% end %>
         <%= f.select(:course_user_datum_id, @users.sort, {prompt: 'select user'}, {class: ''}) %>
+        <p>-OR- Select A Section</p>
+        <%= f.collection_select(:section_id, @course.sections, :id, :name, prompt: 'select section') %>
         <p>Select a new due date</p>
         <%= f.datetime_select :due_at , id: "extension_due_at" %><br>
         <p>-OR- Infinite Extension? <%= f.check_box :infinite, id: "extension_infinite" %></p>

@@ -1,10 +1,10 @@
 class Extension < ActiveRecord::Base
   belongs_to :assessment
   belongs_to :course_user_datum
-  validates_presence_of :course_user_datum_id
   validate :days_or_infinite
-  validates_uniqueness_of :course_user_datum_id, scope: :assessment_id,
-                                                 message: "already has an extension."
+  validates_uniqueness_of :course_user_datum_id, scope: :assessment_id, message: "already has an extension." , :allow_blank => true
+  validates_uniqueness_of :section_id, scope: :assessment_id, message: "already has an extension.", :allow_blank => true
+
 
   after_save :invalidate_cgdubs_for_assessments_after
   after_destroy :invalidate_cgdubs_for_assessments_after,:after_destroy_log
@@ -17,24 +17,26 @@ class Extension < ActiveRecord::Base
   end
 
   def invalidate_cgdubs_for_assessments_after
-    assessment.aud_for(course_user_datum_id).invalidate_cgdubs_for_assessments_after
+    if !course_user_datum_id.nil?
+      assessment.aud_for(course_user_datum_id).invalidate_cgdubs_for_assessments_after
+    end
   end
 
   def after_create_log
     if self.infinite?
       COURSE_LOGGER.log("Extension #{id}: CREATED for " \
-      "#{course_user_datum.user.email} on" \
+      "#{(course_user_datum.nil?)? self.assessment.course.sections.find(self.section_id).name : course_user_datum.user.email} on" \
       " #{assessment.name} for unlimited days")
     else
       COURSE_LOGGER.log("Extension #{id}: CREATED for " \
-      "#{course_user_datum.user.email} on" \
+      "#{(course_user_datum.nil?)? self.assessment.course.sections.find(self.section_id).name : course_user_datum.user.email} on" \
       " #{assessment.name} which is now due at #{due_at}")
     end
   end
 
   def after_destroy_log
     COURSE_LOGGER.log("Extension #{id}: DESTROYED for " \
-    "#{course_user_datum.user.email} on" \
+    "#{(course_user_datum.nil?)? self.assessment.course.sections.find(self.section_id).name : course_user_datum.user.email} on" \
       " #{assessment.name}")
   end
 end

@@ -21,15 +21,35 @@ class ExtensionsController < ApplicationController
 
   action_auth_level :create, :instructor
   def create
-    # Do some verifications to make sure an instructor of one course is not
-    # giving themselves an extension in another course!
-    begin
-      @course.course_user_data.find(params[:extension][:course_user_datum_id])
-    rescue
-      flash[:error] = "No student with id #{params[:extension][:course_user_datum_id]}
-        was found for this course."
+    if !extension_params[:section_id].empty? && !extension_params[:course_user_datum_id].empty?
+      flash[:error] = "Please select section or student but not both"
       redirect_to(action: :index) && return
     end
+    # Do some verifications to make sure an instructor of one course is not
+    # giving themselves an extension in another course!
+    if extension_params[:section_id].empty?
+
+      begin
+        @course.course_user_data.find(extension_params[:course_user_datum_id])
+      rescue
+        flash[:error] = "No student with id #{extension_params[:course_user_datum_id]}
+          was found for this course."
+        redirect_to(action: :index) && return
+      end
+
+    end
+
+    # Verify that the section id blongs to the current course.
+    if extension_params[:course_user_datum_id].empty?
+      begin
+        @course.sections.find(extension_params[:section_id])
+      rescue
+        flash[:error] = "No section with id #{extension_params[:section_id]}
+          was found for this course."
+        redirect_to(action: :index) && return
+      end
+    end
+
     e_params = extension_params
     e_params[:due_at] = DateTime.parse(e_params[:due_at]).strftime("%s")
     ext = @assessment.extensions.create(e_params)
@@ -51,6 +71,6 @@ private
 
   def extension_params
     params.require(:extension).permit(:course_user_datum_id, :due_at, :infinite,
-                                      :commit, :course_id, :assessment_id)
+                                      :commit, :course_id, :assessment_id, :section_id)
   end
 end
