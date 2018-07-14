@@ -210,7 +210,25 @@ class AssessmentUserDatum < ActiveRecord::Base
   end
 
   def extension
-    Extension.find_by(course_user_datum: course_user_datum, assessment_id: assessment_id)
+    regular_extension = Extension.find_by(course_user_datum: course_user_datum, assessment_id: assessment_id)
+    section_extension = Extension.find_by(assessment_id: assessment_id, section_id: section.id)
+
+    if !section_extension.nil? && !regular_extension.nil?
+      return (section_extension.due_at > regular_extension.due_at) ? section_extension : regular_extension
+    end
+    (section_extension.nil?) ? regular_extension : section_extension
+    
+  end
+
+  def section
+    if assessment.is_section_dependant
+      if assessment.lecture?
+        section_extension = Sections.find_by(name: course_user_datum.lecture, course_id: course_user_datum.course.id)
+      else
+        section_extension = Sections.find_by(name: course_user_datum.section, course_id: course_user_datum.course.id)
+      end
+    end
+    section_extension
   end
 
   def self.get(assessment_id, cud_id)
