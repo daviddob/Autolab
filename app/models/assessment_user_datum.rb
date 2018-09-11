@@ -211,7 +211,11 @@ class AssessmentUserDatum < ActiveRecord::Base
 
   def extension
     regular_extension = Extension.find_by(course_user_datum: course_user_datum, assessment_id: assessment_id)
-    section_extension = Extension.find_by(assessment_id: assessment_id, section_id: section.id)
+    if section.nil?
+      section_extension = nil
+    else
+      section_extension = Extension.find_by(assessment_id: assessment_id, section_id: section.id)
+    end
 
     if !section_extension.nil? && !regular_extension.nil?
       return (section_extension.due_at > regular_extension.due_at) ? section_extension : regular_extension
