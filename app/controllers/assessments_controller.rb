@@ -345,91 +345,17 @@ def grade
       exportAutograderFiles()
       return
     end
+    if params[:files_wanted] == "handin"
+      exportStudentFiles()
+      return
+    end
+    if params[:files_wanted] == "everything"
+      exportEverything()
+      return 
+    end
     flash[:error] = "Invaild Parameter Supplied"
     redirect_to(export_course_assessment_path(@course,@assessment))
   end
-
-# methods for sending different file packages depending on what button was clicked
-def exportEverything
-  base_path = Rails.root.join("courses", @course.name).to_s
-  asmt_dir = @assessment.name
-  begin
-      # Pack assessment directory into a tarball.
-      tarStream = StringIO.new("")
-      Gem::Package::TarWriter.new(tarStream) do |tar|
-        tar.mkdir asmt_dir, File.stat(File.join(base_path, asmt_dir)).mode
-        Dir[File.join(base_path, asmt_dir, "**")].each do |file|
-          mode = File.stat(file).mode
-          relative_path = file.sub((/^#{Regexp.escape base_path}\/?/), "")
-
-          if File.directory?(file)
-            tar.mkdir relative_path, mode
-          elsif !relative_path.starts_with? File.join(@assessment.name, @assessment.handin_directory)
-            tar.add_file relative_path, mode do |tarFile|
-              File.open(file, "rb") { |f| tarFile.write f.read }
-            end
-          end
-        end
-      end
-      tarStream.rewind
-      tarStream.close
-      send_data tarStream.string.force_encoding("binary"), filename: "#{@assessment.name}_#{Time.now.strftime('%Y%m%d')}.tar", content_type: "application/x-tar"
-    rescue SystemCallError => e
-      flash[:error] = "Unable to generate tarball -- #{e.message}"
-      redirect_to(:action => 'exportOptions') && return
-    rescue StandardError => e
-      flash[:error] = "Unable to generate tarball -- #{e.message}"
-      redirect_to(:action => 'exportOptions') && return 
-    else
-
-    end
-  end
-
-  def exportAutograderFiles()
-  base_path = Rails.root.join("courses", @course.name).to_s
-  asmt_dir = @assessment.name
-  begin
-      # Pack assessment directory into a tarball.
-      tarStream = StringIO.new("")
-      Gem::Package::TarWriter.new(tarStream) do |tar|
-        autoTar = File.join(base_path, asmt_dir,"autograde.tar")
-        autoMake = File.join(base_path, asmt_dir,"autograde-Makefile")
-
-        tar.add_file "autograde.tar", File.stat(autoTar).mode do |tarFile|
-              File.open(autoTar, "rb") { |f| tarFile.write f.read }
-        end
-
-        tar.add_file "Makefile", File.stat(autoMake).mode do |tarFile|
-            File.open(autoMake, "rb") { |f| tarFile.write f.read }
-        end
-
-      end
-      tarStream.rewind
-      tarStream.close
-      send_data tarStream.string.force_encoding("binary"), filename: "#{@assessment.name}_autograder_files_#{Time.now.strftime('%Y%m%d')}.tar", content_type: "application/x-tar"
-    rescue SystemCallError => e
-      flash[:error] = "Unable to generate tarball -- #{e.message}"
-      redirect_to(:action => 'exportOptions') && return
-    rescue StandardError => e
-      flash[:error] = "Unable to generate tarball -- #{e.message}"
-      redirect_to(:action => 'exportOptions') && return 
-
-
-    else
-
-    end
-  end
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -885,5 +811,115 @@ def edit
       end
     end
     [asmt_rb_exists && asmt_yml_exists && (!asmt_name.nil?), asmt_name]
+  end
+
+  # methods for sending different file packages depending on what button was clicked
+def exportEverything
+  base_path = Rails.root.join("courses", @course.name).to_s
+  asmt_dir = @assessment.name
+  begin
+      # Pack assessment directory into a tarball.
+      tarStream = StringIO.new("")
+      Gem::Package::TarWriter.new(tarStream) do |tar|
+        tar.mkdir asmt_dir, File.stat(File.join(base_path, asmt_dir)).mode
+        Dir[File.join(base_path, asmt_dir, "**", "*")].each do |file|
+          mode = File.stat(file).mode
+          relative_path = file.sub((/^#{Regexp.escape base_path}\/?/), "")
+
+          if File.directory?(file)
+            tar.mkdir relative_path, mode
+          else 
+            tar.add_file relative_path, mode do |tarFile|
+              File.open(file, "rb") { |f| tarFile.write f.read }
+            end
+          end
+        end
+      end
+      tarStream.rewind
+      tarStream.close
+      send_data tarStream.string.force_encoding("binary"), filename: "#{@assessment.name}_#{Time.now.strftime('%Y%m%d')}.tar", content_type: "application/x-tar"
+    rescue SystemCallError => e
+      flash[:error] = "Unable to generate tarball -- #{e.message}"
+      redirect_to(:action => 'exportOptions') && return
+    rescue StandardError => e
+      flash[:error] = "Unable to generate tarball -- #{e.message}"
+      redirect_to(:action => 'exportOptions') && return 
+    else
+
+    end
+  end
+  def exportAutograderFiles()
+  if !@assessment.has_autograder?
+    flash[:error] = "This assignment has no autograder";
+    redirect_to(:action => 'exportOptions') && return 
+  end
+  base_path = Rails.root.join("courses", @course.name).to_s
+  asmt_dir = @assessment.name
+  begin
+      tarStream = StringIO.new("")
+      Gem::Package::TarWriter.new(tarStream) do |tar|
+        autoTar = File.join(base_path, asmt_dir,"autograde.tar")
+        autoMake = File.join(base_path, asmt_dir,"autograde-Makefile")
+
+        tar.add_file "autograde.tar", File.stat(autoTar).mode do |tarFile|
+              File.open(autoTar, "rb") { |f| tarFile.write f.read }
+        end
+
+        tar.add_file "Makefile", File.stat(autoMake).mode do |tarFile|
+            File.open(autoMake, "rb") { |f| tarFile.write f.read }
+        end
+
+      end
+      tarStream.rewind
+      tarStream.close
+      send_data tarStream.string.force_encoding("binary"), filename: "#{@assessment.name}_autograder_files_#{Time.now.strftime('%Y%m%d')}.tar", content_type: "application/x-tar"
+    rescue SystemCallError => e
+      flash[:error] = "Unable to generate tarball -- #{e.message}"
+      redirect_to(:action => 'exportOptions') && return
+    rescue StandardError => e
+      flash[:error] = "Unable to generate tarball -- #{e.message}"
+      redirect_to(:action => 'exportOptions') && return 
+
+
+    else
+
+    end
+  end
+  def exportStudentFiles()
+  base_path = Rails.root.join("courses", @course.name).to_s
+  asmt_dir = @assessment.name
+  begin
+      # Pack assessment directory into a tarball.
+      tarStream = StringIO.new("")
+      Gem::Package::TarWriter.new(tarStream) do |tar|
+        handinDir = File.join(base_path, asmt_dir, @assessment.handin_directory)
+        Dir[File.join(handinDir, "**")].each do |file|
+          mode = File.stat(file).mode
+          relative_path = file.sub((/^#{Regexp.escape base_path}\/?/), "")
+        
+          if File.directory?(file)
+
+          elsif relative_path.starts_with? File.join(@assessment.name, @assessment.handin_directory)
+            tar.add_file relative_path, mode do |tarFile|
+              File.open(file, "rb") { |f| tarFile.write f.read }
+            end
+          end
+        end
+
+      end
+      tarStream.rewind
+      tarStream.close
+      send_data tarStream.string.force_encoding("binary"), filename: "#{@assessment.name}_autograder_files_#{Time.now.strftime('%Y%m%d')}.tar", content_type: "application/x-tar"
+    rescue SystemCallError => e
+      flash[:error] = "Unable to generate tarball -- #{e.message}"
+      redirect_to(:action => 'exportOptions') && return
+    rescue StandardError => e
+      flash[:error] = "Unable to generate tarball -- #{e.message}"
+      redirect_to(:action => 'exportOptions') && return 
+
+
+    else
+
+    end
   end
 end
