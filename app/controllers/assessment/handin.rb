@@ -268,6 +268,13 @@ private
       flash[:error] = "Submission was blank - please upload again."
       return false
     end
+    
+    # check to see if file exists
+    if params[:submission]["file"].nil?
+      flash[:error] = "File was not found - please upload again."
+      return false
+    end
+
     # Check if the file is too large
     if params[:submission]["file"].size > @assessment.max_size * (2**20)
       flash[:error] = "Your submission is larger than the max allowed " \
