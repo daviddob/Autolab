@@ -271,7 +271,7 @@ private
     
     # check to see if file exists
     if params[:submission]["file"].nil?
-      flash[:error] = "File is nil please try again."
+      flash[:error] = "File was not found - please upload again."
       return false
     end
 
