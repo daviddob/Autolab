@@ -140,16 +140,8 @@ class Submission < ActiveRecord::Base
       if params["formfield3"]
           form_hash[assessment.getTextfields[2]] = params["formfield3"]
       end
-      assessment = Assessment.find(self.assessment_id)
-      if(!assessment.base_section_day.nil?)
-        if(assessment.lecture?)
-          form_hash["section_id"] = CourseUserDatum.find(self.course_user_datum_id).lecture
-       else
-          form_hash["section_id"] = CourseUserDatum.find(self.course_user_datum_id).section
-        end
-      end
 
-      form_hash["hartloff_hack_section_id"] = CourseUserDatum.find(self.course_user_datum_id).section
+      form_hash["ubit"] = course_user_datum.user.email.split("@")[0]
       self.settings = form_hash.to_json
       self.save!
   end
