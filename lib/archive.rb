@@ -12,9 +12,8 @@ module Archive
   def self.get_files(archive_path)
     archive_type = get_archive_type(archive_path)
     archive_extract = get_archive(archive_path, archive_type)
-
     files = []
-
+    begin
     # Parse archive header
     archive_extract.each_with_index do |entry, i|
       # Obtain path name depending for tar/zip entry
@@ -24,11 +23,15 @@ module Archive
         pathname: pathname,
         header_position: i,
         mac_bs_file: pathname.include?("__MACOSX") ||
-          pathname.include?(".DS_Store") ||
-          pathname.include?(".metadata"),
+        pathname.include?(".DS_Store") ||
+        pathname.include?(".metadata"),
         directory: looks_like_directory?(pathname)
       }
+
     end
+    rescue Gem::Package::TarInvalidError => e
+      return e;
+     end
 
     archive_extract.close
 
@@ -81,7 +84,6 @@ module Archive
 
   def self.get_archive(filename, archive_type = nil)
     archive_type = get_archive_type(filename) if archive_type.nil?
-
     if archive_type.include? "tar"
       archive_extract = Gem::Package::TarReader.new(File.new(filename))
       archive_extract.rewind # The extract has to be rewinded after every iteration
@@ -99,6 +101,7 @@ module Archive
   def self.get_entry_name(entry)
     # tar/tgz vs zip
     name = entry.respond_to?(:full_name) ? entry.full_name : entry.name
+
     if ! name.ascii_only?
       name = String.new(name)
       name.force_encoding("UTF-8")
