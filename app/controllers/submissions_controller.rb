@@ -391,7 +391,12 @@ class SubmissionsController < ApplicationController
   # files in a submission that is an archive file.
   action_auth_level :listArchive, :student
   def listArchive
-    @files = Archive.get_files(@filename).sort! { |a, b| a[:pathname] <=> b[:pathname] }
+    @files = Archive.get_files(@filename)
+    if(@files.is_a?(Gem::Package::TarInvalidError))
+      flash[:error] = "Error Parsing Tar File " + @files.message
+      return
+    end
+    @files.sort! { |a, b| a[:pathname] <=> b[:pathname] }
   end
 
 private
