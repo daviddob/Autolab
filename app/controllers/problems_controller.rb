@@ -18,11 +18,23 @@ class ProblemsController < ApplicationController
   action_auth_level :create, :instructor
   def create
     @problem = @assessment.problems.new(problem_params)
-    if @problem.save
-      redirect_to(problems_index) && return
-    else
-      flash[:error] = "An error occurred while creating the new problem"
-      redirect_to([:new, @course, @assessment, :problem]) && return
+    respond_to do |format|
+      if  @problem.save
+        format.html { redirect_to(problems_index) }
+        format.js   { }
+        format.json { render :show, status: :created, location: @comment }
+      else
+        
+        format.html {
+          flash[:error] = "An error occurred while creating the new problem"
+          redirect_to([:new, @course, @assessment, :problem]) 
+        }
+        format.js {render nil, status: :unprocessable_entity}
+        format.json {
+          flash[:error] = "An error occurred while creating the new problem"
+          render json: @problem.errors, status: :unprocessable_entity 
+        }
+      end
     end
   end
 

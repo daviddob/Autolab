@@ -1,0 +1,9 @@
+$( document ).ajaxError(function() {
+  $( "#flashes" ).html( '<div id="flash_error" class="error"><%= @problem.errors.full_messages[0] %></div>');
+});
+
+$(document).ajaxSuccess(function() {
+  $( "#flashes" ).html( '<div id="flash_success" class="success">Created Problem: <%= @problem.name %></div>');
+  $("#problem_name, #problem_description, #problem_max_score").val("");
+  $("#problem_optional")[0].checked = false;
+});

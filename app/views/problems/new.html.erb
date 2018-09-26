@@ -4,7 +4,8 @@
 <% content_for :stylesheets do %>
   <%= stylesheet_link_tag "problems" %>
 <% end %>
-
-<%= form_for :problem, url: course_assessment_problems_path(@course, @assessment), method: :post, html: {class: 'edit_problem'}, builder: FormBuilderWithDateTimeInput do |f|%>
+<h2>New Problem</h2>
+<br>
+<%= form_for :problem, url: course_assessment_problems_path(@course, @assessment), method: :post, html: {class: 'edit_problem'},:remote => true, builder: FormBuilderWithDateTimeInput do |f|%>
   <%= render partial: "fields", locals: {f: f} %>
 <% end %>
