@@ -1,0 +1,17 @@
+<% @title = "Export" %>
+ <%= stylesheet_link_tag 'assessments/export' %>
+<h2 id="exportHeading">Export Options For <%= link_to @assessment.display_name, course_assessment_path(@course, @assessment) %></h2>
+<div class="action_buttons">
+<%= button_to "Export Autograder Files", export_course_assessment_path,
+{ method: :post, params: {:files_wanted => "autograde"},
+ :class=>(@assessment.has_autograder?) ? "btn primary": "btn disabled"} %>
+ <%= button_to "Export Student Submissions", export_course_assessment_path,
+{ method: :post, params: {:files_wanted => "handin"},
+ :class=>"btn primary"} %>
+ <%= button_to "Export Everything", export_course_assessment_path,
+{ method: :post, params: {:files_wanted => "everything"},
+ :class=>"btn primary"} %>
+</div>
+
+
+

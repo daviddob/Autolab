@@ -8,8 +8,8 @@ require "yaml"
 class AssessmentsController < ApplicationController
   include ActiveSupport::Callbacks
 
-    rescue_from ActionView::MissingTemplate do |exception|
-      redirect_to("/home/error_404")
+  rescue_from ActionView::MissingTemplate do |exception|
+    redirect_to("/home/error_404")
   end
 
   autolab_require Rails.root.join("app", "controllers", "assessment", "handin.rb")
@@ -26,9 +26,9 @@ class AssessmentsController < ApplicationController
 
   # this is inherited from ApplicationController
   before_action :set_assessment, except: [:index, :new, :create, :installAssessment,
-                                          :importAsmtFromTar, :importAssessment,
-                                          :log_submit, :local_submit, :autograde_done]
-  before_action :set_submission, only: [:viewFeedback]
+    :importAsmtFromTar, :importAssessment,
+    :log_submit, :local_submit, :autograde_done]
+    before_action :set_submission, only: [:viewFeedback]
 
   # We have to do this here, because the modules don't inherit ApplicationController.
 
@@ -66,8 +66,8 @@ class AssessmentsController < ApplicationController
   def index
     @is_instructor = @cud.has_auth_level? :instructor
     @announcements = Announcement.where("start_date < :now AND end_date > :now", now: Time.now)
-                                 .where("course_id = ? OR system = ?", @course.id, true)
-                                 .where(persistent: false).order(:start_date)
+    .where("course_id = ? OR system = ?", @course.id, true)
+    .where(persistent: false).order(:start_date)
     @attachments = (@cud.instructor?) ? @course.attachments : @course.attachments.where(released: true)
   end
 
@@ -140,15 +140,15 @@ class AssessmentsController < ApplicationController
         relative_pathname = entry.full_name
         if entry.directory?
           FileUtils.mkdir_p(File.join(course_root, relative_pathname),
-                            mode: entry.header.mode, verbose: false)
+            mode: entry.header.mode, verbose: false)
         elsif entry.file?
           FileUtils.mkdir_p(File.join(course_root, File.dirname(relative_pathname)),
-                            mode: entry.header.mode, verbose: false)
+            mode: entry.header.mode, verbose: false)
           File.open(File.join(course_root, relative_pathname), "wb") do |f|
             f.write entry.read
           end
           FileUtils.chmod entry.header.mode, File.join(course_root, relative_pathname),
-                          verbose: false
+          verbose: false
         elsif entry.header.typeflag == "2"
           File.symlink entry.header.linkname, File.join(course_root, relative_pathname)
         end
@@ -227,7 +227,7 @@ class AssessmentsController < ApplicationController
         FileUtils.remove_dir(@assessment.folder_path)
       rescue StandardError => e2
         flash[:error] += "An error occurred (#{e2}} " \
-          " while recovering from a previous error (#{flash[:error]})"
+        " while recovering from a previous error (#{flash[:error]})"
         redirect_to(action: :installAssessment)
         return
       end
@@ -297,25 +297,25 @@ class AssessmentsController < ApplicationController
   # trust the upstream developer to do that for us.
   def raw_score(scores)
     if @assessment.has_autograder? &&
-       @assessment.overwrites_method?(:raw_score)
-      sum = @assessment.config_module.raw_score(scores)
-    else
-      sum = 0.0
-      scores.each_value { |value| sum += (value.to_f) }
-    end
-
-    sum
+     @assessment.overwrites_method?(:raw_score)
+     sum = @assessment.config_module.raw_score(scores)
+   else
+    sum = 0.0
+    scores.each_value { |value| sum += (value.to_f) }
   end
 
-  def grade
-    @problem = @assessment.problems.find(params[:problem])
-    @submission = @assessment.submissions.find(params[:submission])
+  sum
+end
+
+def grade
+  @problem = @assessment.problems.find(params[:problem])
+  @submission = @assessment.submissions.find(params[:submission])
     # Shows a form which has the submission on top, and feedback on bottom
     begin
       subFile = File.join(Rails.root, "courses",
-                          @course.name, @assessment.name,
-                          @assessment.handin_directory,
-                          @submission.filename)
+        @course.name, @assessment.name,
+        @assessment.handin_directory,
+        @submission.filename)
       @submissionData = File.read(subFile)
     rescue
       @submissionData = "Could not read #{subFile}"
@@ -335,53 +335,34 @@ class AssessmentsController < ApplicationController
   # properties in a yaml properties file.
   action_auth_level :export, :instructor
   def export
-    base_path = Rails.root.join("courses", @course.name).to_s
-    asmt_dir = @assessment.name
-    begin
-      # Update the assessment config YAML file.
-      @assessment.dump_yaml
-      # Pack assessment directory into a tarball.
-      tarStream = StringIO.new("")
-      Gem::Package::TarWriter.new(tarStream) do |tar|
-        tar.mkdir asmt_dir, File.stat(File.join(base_path, asmt_dir)).mode
-        Dir[File.join(base_path, asmt_dir, "**")].each do |file|
-          mode = File.stat(file).mode
-          relative_path = file.sub((/^#{Regexp.escape base_path}\/?/), "")
-
-          if File.directory?(file)
-            tar.mkdir relative_path, mode
-          elsif !relative_path.starts_with? File.join(@assessment.name, @assessment.handin_directory)
-            tar.add_file relative_path, mode do |tarFile|
-              File.open(file, "rb") { |f| tarFile.write f.read }
-            end
-          end
-        end
-      end
-      tarStream.rewind
-      tarStream.close
-      send_data tarStream.string.force_encoding("binary"), filename: "#{@assessment.name}_#{Time.now.strftime('%Y%m%d')}.tar", content_type: "application/x-tar"
-    rescue SystemCallError => e
-      flash[:error] = "Unable to update the config YAML file: #{e}"
-      redirect_to action: "index"
-    rescue StandardError => e
-      flash[:error] = "Unable to generate tarball -- #{e.message}"
-      redirect_to action: "index"
-    else
-      flash[:success] = "Successfully exported the assessment."
+    if params[:files_wanted] == "autograde"
+      exportAutograderFiles()
+      return
+    end
+    if params[:files_wanted] == "handin"
+      exportStudentFiles()
+      return
+    end
+    if params[:files_wanted] == "everything"
+      exportEverything()
+      return 
     end
   end
 
-  action_auth_level :destroy, :instructor
-  def destroy
-    for submission in @assessment.submissions do
-      submission.destroy
-    end
 
-    for attachment in @assessment.attachments do
-      attachment.destroy
-    end
 
-    name = @assessment.display_name
+
+action_auth_level :destroy, :instructor
+def destroy
+  for submission in @assessment.submissions do
+    submission.destroy
+  end
+
+  for attachment in @assessment.attachments do
+    attachment.destroy
+  end
+
+  name = @assessment.display_name
     @assessment.destroy # awwww!!!!
     flash[:success] = "The assessment #{name} has been deleted."
     redirect_to(course_path(@course)) && return
@@ -419,14 +400,14 @@ class AssessmentsController < ApplicationController
     @problems = @assessment.problems
 
     results = @submissions.select("submissions.id AS submission_id",
-                                  "problems.id AS problem_id",
-                                  "scores.id AS score_id",
-                                  "scores.*")
-              .joins("LEFT JOIN problems ON
-        submissions.assessment_id = problems.assessment_id")
-              .joins("LEFT JOIN scores ON
-        (submissions.id = scores.submission_id
-        AND problems.id = scores.problem_id)")
+      "problems.id AS problem_id",
+      "scores.id AS score_id",
+      "scores.*")
+    .joins("LEFT JOIN problems ON
+      submissions.assessment_id = problems.assessment_id")
+    .joins("LEFT JOIN scores ON
+      (submissions.id = scores.submission_id
+      AND problems.id = scores.problem_id)")
 
     # Process them to get into a format we want.
     @scores = {}
@@ -462,14 +443,14 @@ class AssessmentsController < ApplicationController
     @problems = @assessment.problems
 
     results = @submissions.select("submissions.id AS submission_id",
-                                  "problems.id AS problem_id",
-                                  "scores.id AS score_id",
-                                  "scores.*")
-              .joins("LEFT JOIN problems ON
-        submissions.assessment_id = problems.assessment_id")
-              .joins("LEFT JOIN scores ON
-        (submissions.id = scores.submission_id
-        AND problems.id = scores.problem_id)")
+      "problems.id AS problem_id",
+      "scores.id AS score_id",
+      "scores.*")
+    .joins("LEFT JOIN problems ON
+      submissions.assessment_id = problems.assessment_id")
+    .joins("LEFT JOIN scores ON
+      (submissions.id = scores.submission_id
+      AND problems.id = scores.problem_id)")
 
     # Process them to get into a format we want.
     @scores = {}
@@ -518,112 +499,112 @@ class AssessmentsController < ApplicationController
 
   action_auth_level :viewAssigned, :course_assistant
   def viewAssigned
-    
+
     redirect_to(action: "viewGradesheet") && return
   end
-                     
+
   
   action_auth_level :unassignCA, :instructor
   def unassignCA
-      for submission in @assessment.submissions do
-          submission.set_grader("Unassigned")
-      end
-      @assessment.assignCA = false
-      @assessment.save!
-      flash[:success] = "Success: Submissions have no assigned graders."
-      redirect_to(action: :show) && return
+    for submission in @assessment.submissions do
+      submission.set_grader("Unassigned")
+    end
+    @assessment.assignCA = false
+    @assessment.save!
+    flash[:success] = "Success: Submissions have no assigned graders."
+    redirect_to(action: :show) && return
   end
-                     
+
   action_auth_level :assignCA, :instructor
   def assignCA
     conflicts = {}
     hours = {}
     course_assistants = @course.course_assistants
     for course_assistant in course_assistants do
-        if !course_assistant.conflictingstudents.nil?
-             conflicts[course_assistant] = course_assistant.conflictingstudents.split(/\s*,\s*/)
-        else
-             conflicts[course_assistant] = []
-        end
-        if !course_assistant.hours.nil?
-             hours[course_assistant] = course_assistant.hours
-        else
-             hours[course_assistant] = 0
-        end
-    end
-    bestSolution = -1
-    bestAssignment = {}
-    totalHours = 0
-    badnessAcrossSolutions = []
+      if !course_assistant.conflictingstudents.nil?
+       conflicts[course_assistant] = course_assistant.conflictingstudents.split(/\s*,\s*/)
+     else
+       conflicts[course_assistant] = []
+     end
+     if !course_assistant.hours.nil?
+       hours[course_assistant] = course_assistant.hours
+     else
+       hours[course_assistant] = 0
+     end
+   end
+   bestSolution = -1
+   bestAssignment = {}
+   totalHours = 0
+   badnessAcrossSolutions = []
+   for course_assistant in course_assistants do
+    totalHours += hours[course_assistant]
+  end
+  if totalHours == 0
+    flash[:error] = "All the CAs work 0 hours per week. Aborting."
+    redirect_to([@course, @assessment, :submissions])
+    return;
+  end
+  for i in 0..30 do
+    r = Random.new
+    assignments = {}
     for course_assistant in course_assistants do
-        totalHours += hours[course_assistant]
-    end
-    if totalHours == 0
-        flash[:error] = "All the CAs work 0 hours per week. Aborting."
-        redirect_to([@course, @assessment, :submissions])
-        return;
-    end
-    for i in 0..30 do
-        r = Random.new
-        assignments = {}
-        for course_assistant in course_assistants do
-            assignments[course_assistant] = []
-        end
-        for submission in @assessment.submissions.latest do
-            canGrade = []
-             for course_assistant in course_assistants do
-                 if !conflicts[course_assistant].include? submission.course_user_datum.user.email
-                   canGrade.push(course_assistant)
-                 end
-             end
-             probabilityBalancing = []
-             for course_assistant in canGrade do
-                 for i in 1..hours[course_assistant] do
-                     probabilityBalancing.push(course_assistant)
-                 end
-             end
-             if probabilityBalancing.length != 0
-                choice = r.rand(0...probabilityBalancing.length)
-                assignments[probabilityBalancing[choice]].push(submission.course_user_datum)
-             end
-        end
-        badness = []
-        assignments.each do |course_assistant, assignments|
-            idealSubmissions = hours[course_assistant].to_f/totalHours
-            badnessta = ((idealSubmissions*@assessment.submissions.latest.count - assignments.count).round).abs
-            badness.push(badnessta)
-        end
-        badnessSolution = badness.max
-        badnessAcrossSolutions.push(badnessSolution)
-        if bestSolution == -1 || badnessSolution < bestSolution
-            bestSolution = badnessSolution
-            bestAssignment = assignments
-        end
-    end
-    s = {}
-    bestAssignment.each do |course_assistant, assignments|
-            s[course_assistant.user.email] = []
-        for student in assignments do
-            s[course_assistant.user.email].push(student.user.email)
-        end
-    end
-    studentGrader = {}
-    bestAssignment.each do |course_assistant, assignments|
-        for student in assignments do
-            studentGrader[student] = course_assistant
-        end
+      assignments[course_assistant] = []
     end
     for submission in @assessment.submissions.latest do
-        submission.set_grader(studentGrader[submission.course_user_datum].user.email)
+      canGrade = []
+      for course_assistant in course_assistants do
+       if !conflicts[course_assistant].include? submission.course_user_datum.user.email
+         canGrade.push(course_assistant)
+       end
+     end
+     probabilityBalancing = []
+     for course_assistant in canGrade do
+       for i in 1..hours[course_assistant] do
+         probabilityBalancing.push(course_assistant)
+       end
+     end
+     if probabilityBalancing.length != 0
+      choice = r.rand(0...probabilityBalancing.length)
+      assignments[probabilityBalancing[choice]].push(submission.course_user_datum)
     end
-    flash[:success] = badnessAcrossSolutions.to_s + " Badness: #{bestSolution}"
-    @assessment.assignCA = true
-    @assessment.save!
-    redirect_to([@course, @assessment, :submissions])
   end
+  badness = []
+  assignments.each do |course_assistant, assignments|
+    idealSubmissions = hours[course_assistant].to_f/totalHours
+    badnessta = ((idealSubmissions*@assessment.submissions.latest.count - assignments.count).round).abs
+    badness.push(badnessta)
+  end
+  badnessSolution = badness.max
+  badnessAcrossSolutions.push(badnessSolution)
+  if bestSolution == -1 || badnessSolution < bestSolution
+    bestSolution = badnessSolution
+    bestAssignment = assignments
+  end
+end
+s = {}
+bestAssignment.each do |course_assistant, assignments|
+  s[course_assistant.user.email] = []
+  for student in assignments do
+    s[course_assistant.user.email].push(student.user.email)
+  end
+end
+studentGrader = {}
+bestAssignment.each do |course_assistant, assignments|
+  for student in assignments do
+    studentGrader[student] = course_assistant
+  end
+end
+for submission in @assessment.submissions.latest do
+  submission.set_grader(studentGrader[submission.course_user_datum].user.email)
+end
+flash[:success] = badnessAcrossSolutions.to_s + " Badness: #{bestSolution}"
+@assessment.assignCA = true
+@assessment.save!
+redirect_to([@course, @assessment, :submissions])
+end
 
-  action_auth_level :edit, :instructor
-  def edit
+action_auth_level :edit, :instructor
+def edit
     # default to the basic tab
     params[:active_tab] ||= "basic"
 
@@ -645,15 +626,15 @@ class AssessmentsController < ApplicationController
       @assessment.save!
     end
     if @assessment.is_section_dependant
-    edit_assessment_params["base_section_day"] = params["assessment"]["start_at"]
-    edit_assessment_params["start_offset"] = params["startoffset"]
-    edit_assessment_params["end_offset"] = params["endoffset"]
-    edit_assessment_params["on_day"] = params["sameDay"].nil? ? 0 : 1
-    edit_assessment_params["lecture"] = params["lecture"].nil? ? 0 : 1
-    edit_assessment_params["start_at"] = Date.parse(edit_assessment_params["base_section_day"]).to_datetime
-    edit_assessment_params["due_at"] = edit_assessment_params["start_at"]+ 30.minutes
+      edit_assessment_params["base_section_day"] = params["assessment"]["start_at"]
+      edit_assessment_params["start_offset"] = params["startoffset"]
+      edit_assessment_params["end_offset"] = params["endoffset"]
+      edit_assessment_params["on_day"] = params["sameDay"].nil? ? 0 : 1
+      edit_assessment_params["lecture"] = params["lecture"].nil? ? 0 : 1
+      edit_assessment_params["start_at"] = Date.parse(edit_assessment_params["base_section_day"]).to_datetime
+      edit_assessment_params["due_at"] = edit_assessment_params["start_at"]+ 30.minutes
 
-  end
+    end
     flash[:success] = "Saved!" if @assessment.update!(edit_assessment_params)
 
     redirect_to(action: :edit) && return
@@ -686,8 +667,8 @@ class AssessmentsController < ApplicationController
       flash[:success] = "%d %s released." % [num_released, (num_released > 1 ? "grades were" : "grade was")]
     else
       flash[:error] = "No grades were released. " \
-                      "Either they were all already released or you might be assigned to a lecture " \
-                      "and/or section that doesn't exist. Please contact an instructor."
+      "Either they were all already released or you might be assigned to a lecture " \
+      "and/or section that doesn't exist. Please contact an instructor."
     end
     redirect_to action: "viewGradesheet"
   end
@@ -716,9 +697,9 @@ class AssessmentsController < ApplicationController
     if @assessment.writeup_is_file?
       filename = @assessment.writeup_path
       send_file(filename,
-                type: mime_type_from_ext(File.extname(filename)),
-                disposition: "inline",
-                file: File.basename(filename))
+        type: mime_type_from_ext(File.extname(filename)),
+        disposition: "inline",
+        file: File.basename(filename))
       return
     end
 
@@ -733,7 +714,7 @@ class AssessmentsController < ApplicationController
     File.delete(f)
   end
 
-protected
+  protected
 
   # We only do this so that it can be overwritten by modules
   def updateScore(_user, score)
@@ -764,8 +745,8 @@ protected
           # if score doesn't exist yet, create it and release it
         else
           score = problem.scores.new(submission: sub,
-                                     released: true,
-                                     grader: @cud)
+           released: true,
+           grader: @cud)
           num_released += 1
         end
 
@@ -776,7 +757,7 @@ protected
     num_released
   end
 
-private
+  private
 
   def new_assessment_params
     ass = params.require(:assessment)
@@ -822,5 +803,105 @@ private
       end
     end
     [asmt_rb_exists && asmt_yml_exists && (!asmt_name.nil?), asmt_name]
+  end
+
+  # methods for sending different file packages depending on what button was clicked
+def exportEverything
+  base_path = Rails.root.join("courses", @course.name).to_s
+  asmt_dir = @assessment.name
+  begin
+      # Pack assessment directory into a tarball.
+      tarStream = StringIO.new("")
+      Gem::Package::TarWriter.new(tarStream) do |tar|
+        tar.mkdir asmt_dir, File.stat(File.join(base_path, asmt_dir)).mode
+        Dir[File.join(base_path, asmt_dir, "**", "*")].each do |file|
+          mode = File.stat(file).mode
+          relative_path = file.sub((/^#{Regexp.escape base_path}\/?/), "")
+
+          if File.directory?(file)
+            tar.mkdir relative_path, mode
+          else 
+            tar.add_file relative_path, mode do |tarFile|
+              File.open(file, "rb") { |f| tarFile.write f.read }
+            end
+          end
+        end
+      end
+      tarStream.rewind
+      tarStream.close
+      send_data tarStream.string.force_encoding("binary"), filename: "#{@assessment.name}_#{Time.now.strftime('%Y%m%d')}.tar", content_type: "application/x-tar"
+    rescue SystemCallError => e
+      flash[:error] = "Unable to generate tarball -- #{e.message}"
+      redirect_to(:action => 'exportOptions') && return
+    rescue StandardError => e
+      flash[:error] = "Unable to generate tarball -- #{e.message}"
+      redirect_to(:action => 'exportOptions') && return 
+    end
+  end
+  def exportAutograderFiles()
+  if !@assessment.has_autograder?
+    flash[:error] = "This assignment has no autograder";
+    redirect_to(:action => 'exportOptions') && return 
+  end
+  base_path = Rails.root.join("courses", @course.name).to_s
+  asmt_dir = @assessment.name
+  begin
+      tarStream = StringIO.new("")
+      Gem::Package::TarWriter.new(tarStream) do |tar|
+        autoTar = File.join(base_path, asmt_dir,"autograde.tar")
+        autoMake = File.join(base_path, asmt_dir,"autograde-Makefile")
+
+        tar.add_file "autograde.tar", File.stat(autoTar).mode do |tarFile|
+              File.open(autoTar, "rb") { |f| tarFile.write f.read }
+        end
+
+        tar.add_file "Makefile", File.stat(autoMake).mode do |tarFile|
+            File.open(autoMake, "rb") { |f| tarFile.write f.read }
+        end
+
+      end
+      tarStream.rewind
+      tarStream.close
+      send_data tarStream.string.force_encoding("binary"), filename: "#{@assessment.name}_autograder_files_#{Time.now.strftime('%Y%m%d')}.tar", content_type: "application/x-tar"
+    rescue SystemCallError => e
+      flash[:error] = "Unable to generate tarball -- #{e.message}"
+      redirect_to(:action => 'exportOptions') && return
+    rescue StandardError => e
+      flash[:error] = "Unable to generate tarball -- #{e.message}"
+      redirect_to(:action => 'exportOptions') && return 
+    end
+  end
+  def exportStudentFiles()
+  base_path = Rails.root.join("courses", @course.name).to_s
+  asmt_dir = @assessment.name
+  begin
+      # Pack assessment directory into a tarball.
+      tarStream = StringIO.new("")
+      Gem::Package::TarWriter.new(tarStream) do |tar|
+        handinDir = File.join(base_path, asmt_dir, @assessment.handin_directory)
+        Dir[File.join(handinDir, "**")].each do |file|
+          mode = File.stat(file).mode
+          relative_path = file.sub((/^#{Regexp.escape base_path}\/?/), "")
+        
+          if File.directory?(file)
+
+          elsif relative_path.starts_with? File.join(@assessment.name, @assessment.handin_directory)
+            tar.add_file relative_path, mode do |tarFile|
+              File.open(file, "rb") { |f| tarFile.write f.read }
+            end
+          end
+        end
+
+      end
+      tarStream.rewind
+      tarStream.close
+      send_data tarStream.string.force_encoding("binary"), filename: "#{@assessment.name}_autograder_files_#{Time.now.strftime('%Y%m%d')}.tar", content_type: "application/x-tar"
+    rescue SystemCallError => e
+      flash[:error] = "Unable to generate tarball -- #{e.message}"
+      redirect_to(:action => 'exportOptions') && return
+    rescue StandardError => e
+      flash[:error] = "Unable to generate tarball -- #{e.message}"
+      redirect_to(:action => 'exportOptions') && return 
+    end
   end
 end
