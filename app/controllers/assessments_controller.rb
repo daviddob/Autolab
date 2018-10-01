@@ -333,12 +333,6 @@ def grade
 
   # export - export an assessment by saving its persistent
   # properties in a yaml properties file.
-  action_auth_level :exportOptions, :instructor
-  def exportOptions
-
-
-  end
-
   action_auth_level :export, :instructor
   def export
     if params[:files_wanted] == "autograde"
@@ -353,8 +347,6 @@ def grade
       exportEverything()
       return 
     end
-    flash[:error] = "Invaild Parameter Supplied"
-    redirect_to(export_course_assessment_path(@course,@assessment))
   end
 
 
@@ -844,8 +836,6 @@ def exportEverything
     rescue StandardError => e
       flash[:error] = "Unable to generate tarball -- #{e.message}"
       redirect_to(:action => 'exportOptions') && return 
-    else
-
     end
   end
   def exportAutograderFiles()
@@ -879,10 +869,6 @@ def exportEverything
     rescue StandardError => e
       flash[:error] = "Unable to generate tarball -- #{e.message}"
       redirect_to(:action => 'exportOptions') && return 
-
-
-    else
-
     end
   end
   def exportStudentFiles()
@@ -916,10 +902,6 @@ def exportEverything
     rescue StandardError => e
       flash[:error] = "Unable to generate tarball -- #{e.message}"
       redirect_to(:action => 'exportOptions') && return 
-
-
-    else
-
     end
   end
 end
