@@ -3,7 +3,7 @@ var hideStudent;
 jQuery(function($) {
 
 
-  $.fn.dataTable.ext.search.push(
+  $.fn.dataTableExt.afnFiltering.push(
     function(settings, data, dataIndex) {
       var filterOnlyLatest = $("#only-latest").is(':checked');
       if (!filterOnlyLatest) {
@@ -15,7 +15,6 @@ jQuery(function($) {
       }
     }
   );
-
 
   var $floater = $("#floater"),
     $backdrop = $("#gradeBackdrop");
@@ -45,17 +44,16 @@ jQuery(function($) {
         '<div class="row"><input type="checkbox" id="only-latest">' +
         '<label for="only-latest">Show only latest</label></div>'
     },
-    "columnDefs": [{
-      "targets": [7],
-      "visible": false,
-      // "searchable": false
-    }],
     "aaSorting": [
       [3, "desc"]
+    ],
+    "aoColumnDefs": [
+      { "bSortable": false, "aTargets": [ 0 ] },
+      {"bVisible": false, "aTargets": [7]}
     ]
   });
 
-  $("#only-latest").on("change", function() {
+  $("#only-latest").on("change", function() {;
     table.draw();
   });
 

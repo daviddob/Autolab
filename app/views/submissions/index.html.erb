@@ -9,7 +9,6 @@
   <%= javascript_include_tag "sorttable" %>
   <%= external_javascript_include_tag "jquery.dataTables", "1.10.5" %>
 
-  <%= javascript_include_tag "table_floating_header" %>
   <%= javascript_include_tag "manage_submissions" %>
 
 <% end %>
@@ -69,7 +68,7 @@
   <% end %>
   <thead>
     <tr>
-      <th><input type="checkbox" id="selectall"/></th>
+      <th><input name="sall" type="checkbox" id="selectall"/> <label for="sall"></label></th>
     <% for header in headers %>
       <th><%= header %></th>
     <% end %>
@@ -78,7 +77,7 @@
   <tbody>
   <% for submission in @submissions %>
     <tr id="row-<%= submission.id %>" class="submission-row">
-      <td><input class="cbox" type="checkbox" id="cbox-<%= submission.id %>"></td>
+      <td><input name="cbox" class="cbox" type="checkbox" id="cbox-<%= submission.id %>"><label for="cbox"></label></td>
       <td><%= link_to submission.course_user_datum.email,
                       history_course_assessment_path(@course, @assessment, cud_id: submission.course_user_datum_id, partial: true),
                       {remote: true, class: :trigger}
@@ -104,7 +103,7 @@
                 [:regrade, @course, @assessment, submission_id: submission.id],
                 { method: :post,
                  :title=>"Rerun the autograder on this submission",
-                 :class=>"waves-effect waves-light btn small regrade-override"} %>
+                 :class=>"btn small regrade-override"} %>
           <% end %>
           <%= link_to "Edit", [:edit, @course, @assessment, submission],
               {:title=>"Edit the grading properties of this submission",
