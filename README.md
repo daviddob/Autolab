@@ -14,12 +14,13 @@ This is the main repository that includes the application layer of the project. 
 
 
 # Getting Started
-####Running on Docker: Follow [this guide] (https://github.com/autolab/Autolab/wiki/Deploying-Autolab-with-Docker)
-######This is recommended for real-world usage
-=====
 
-####Running on your machine:
-######This is recommended for development and trial purposes
+# Deploying Autolab on Docker: 
+Follow [this guide](https://github.com/autolab/Autolab/wiki/Deploying-Autolab-with-Docker) to get started with deploying Autolab using Docker. This is the recommended deployment method for real-world usage with Autolab.
+
+
+# Running Autolab locally on your machine:
+> This is recommended for development and trial purposes:
 
 __For Ubuntu 14.04+ users__: To complete all following steps with a bash script, run:
 ```
@@ -86,9 +87,9 @@ __For Mac users__: Follow the step-by-step instruction below (we are working on 
 
 	```sh
 	bundle exec rake db:create
-  # if you have no existing database:
+  # If you have no existing database:
 	bundle exec rake db:reset
-  # if you already have a database whose data you want to preserve:
+  # If you already have a database whose data you want to preserve:
   bundle exec rake db:migrate
 	```
 
