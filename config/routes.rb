@@ -88,6 +88,7 @@ Autolab3::Application.routes.draw do
         get "statistics"
         get "withdrawAllGrades"
         get "export"
+        post "export"
         patch "edit/*active_tab", action: :update
         get "edit/*active_tab", action: :edit
         post "handin"
