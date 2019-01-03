@@ -7,6 +7,7 @@ class SubmissionsController < ApplicationController
   before_action :set_assessment
   before_action :set_submission, only: [:destroy, :destroyConfirm, :download, :edit, :listArchive, :update, :view]
   before_action :get_submission_file, only: [:download, :listArchive, :view]
+  before_action :set_cache_headers , only: [:edit]
   rescue_from ActionView::MissingTemplate do |exception|
       redirect_to("/home/error_404")
   end
@@ -401,6 +402,12 @@ class SubmissionsController < ApplicationController
 
 private
 
+  def set_cache_headers
+    response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "Fri, 01 Jan 1990 00:00:00 GMT"
+  end
+
   def new_submission_params
     params.require(:submission).permit(:course_used_datum_id, :notes, :file,
                                        tweak_attributes: [:_destroy, :kind, :value])
@@ -408,7 +415,7 @@ private
 
   def edit_submission_params
     params.require(:submission).permit(:notes,
-                                       tweak_attributes: [:_destroy, :kind, :value])
+                                       tweak_attributes: [:id, :_destroy, :kind, :value])
   end
 
   def get_submission_file
