@@ -3,7 +3,7 @@ var hideStudent;
 jQuery(function($) {
 
 
-  $.fn.dataTable.ext.search.push(
+  $.fn.dataTableExt.afnFiltering.push(
     function(settings, data, dataIndex) {
       var filterOnlyLatest = $("#only-latest").is(':checked');
       if (!filterOnlyLatest) {
@@ -15,7 +15,6 @@ jQuery(function($) {
       }
     }
   );
-
 
   var $floater = $("#floater"),
     $backdrop = $("#gradeBackdrop");
@@ -45,13 +44,12 @@ jQuery(function($) {
         '<div class="row"><input type="checkbox" id="only-latest">' +
         '<label for="only-latest">Show only latest</label></div>'
     },
-    "columnDefs": [{
-      "targets": [7],
-      "visible": false,
-      // "searchable": false
-    }],
     "aaSorting": [
       [3, "desc"]
+    ],
+    "aoColumnDefs": [
+      { "bSortable": false, "aTargets": [ 0 ] },
+      {"bVisible": false, "aTargets": [7]}
     ]
   });
 
@@ -110,10 +108,14 @@ jQuery(function($) {
     }
   });
 
-  $('#submissions').on("click", ".cbox", function(e) {
-    var submissionId = parseInt(e.currentTarget.id.replace("cbox-", ""), 10);
-    toggleRow(submissionId);
-    e.stopPropagation();
+
+  $('#submissions').on("click", ".all-header" ,function(e) {
+    $(".submission-row").each(function(index){
+      var submissionId = parseInt($(this)[0].id.replace("row-", ""), 10);
+      toggleRow(submissionId);
+    });
+    $('#sall').prop("checked", !$('#sall').prop("checked"));
+    // $('.cbox').trigger("click");
   });
 
   $('.regrade-override').click(function(e) {
@@ -124,5 +126,7 @@ jQuery(function($) {
       $(this).attr('target', '_blank');
     }
   });
+
+  $('input[type=checkbox]').prop("checked", false);
 
 });
