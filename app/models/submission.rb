@@ -142,6 +142,9 @@ class Submission < ActiveRecord::Base
       end
 
       form_hash["ubit"] = course_user_datum.user.email.split("@")[0]
+      if assessment.is_section_dependant
+        form_hash["section"] = (assessment.lecture?) ? course_user_datum.lecture : course_user_datum.section
+      end
       self.settings = form_hash.to_json
       self.save!
   end
