@@ -394,8 +394,12 @@ class SubmissionsController < ApplicationController
   def listArchive
     @files = Archive.get_files(@filename)
     if(@files.is_a?(Gem::Package::TarInvalidError))
-      flash[:error] = "Error Parsing Tar File " + @files.message
-      return
+      flash[:error] = "Error Parsing Tar File: " + @files.message
+      redirect_to([:history, @course, @assessment, cud_id: @submission.course_user_datum_id]) && return
+    end
+      if(@files.is_a?(Zip::Error))
+      flash[:error] = "Error Parsing Zip File: " + @files.message
+      redirect_to([:history, @course, @assessment, cud_id: @submission.course_user_datum_id]) && return
     end
     @files.sort! { |a, b| a[:pathname] <=> b[:pathname] }
   end
