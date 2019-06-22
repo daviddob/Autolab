@@ -25,6 +25,11 @@
 	<%= f.text_field :writeup, help_text: "File in the assessment directory or URL containing instructions to students. E.g., 'writeup/malloclab.pdf', 'http://school.edu/class/writeup.pdf'" %>
 </div>
 
+<div class="assessments-redirect" style="margin-top: 15px;">
+   <%= f.check_box :handin_redirect , display_name: "Redirect To Handin", style: "margin-top: 1.0rem;" %>
+   <p class="help-block">Redirects Student Their Most Recent Submission.</p>
+</div>
+
 <div class="embedded-form" style="margin-top: 2rem;">
   <%= f.check_box :embedded_quiz, display_name: "Embedded Form", style: "margin-top: 0.8rem;", onclick: "boxClicked();" %>
 
