@@ -16,6 +16,27 @@ jQuery(function($) {
     }
   );
 
+  $.fn.dataTableExt.afnFiltering.push(
+    function(settings, data, dataIndex) {
+      var hideStudent = $("#hide-students").is(':checked');
+      var hideCA = $("#hide-ca").is(':checked');
+      var hideInstructor = $("#hide-instructors").is(':checked');
+      var role = data[8];
+
+      if(role == "instructor" && hideInstructor){
+        return false;
+      }
+      if(role == "student" && hideStudent){
+        return false;
+      }      
+      if(role == "assistant" && hideCA){
+        return false;
+      }
+
+      return true;
+    }
+  );
+
   var $floater = $("#floater"),
     $backdrop = $("#gradeBackdrop");
   $('.trigger').bind('ajax:success', function showStudent(event, data, status, xhr) {
@@ -33,27 +54,26 @@ jQuery(function($) {
   var table = $('#submissions').DataTable({
     'sPaginationType': 'full_numbers',
     'iDisplayLength': 100,
+    'pageLength': 50,
     'oLanguage': {
-      'sLengthMenu': 'Display <select>' +
-        '<option value="10">10</option>' +
-        '<option value="20">20</option>' +
-        '<option value="50">50</option>' +
-        '<option value="100">100</option>' +
-        '<option value="-1">All</option>' +
-        '</select> records   ·   ' +
-        '<div class="row"><input type="checkbox" id="only-latest">' +
-        '<label for="only-latest">Show only latest</label></div>'
+      'sLengthMenu':
+        '<div class="row">' +
+        '<div class="sort-item"><input type="checkbox" id="only-latest"><label for="only-latest">Show only latest</label></div>'+
+        '<div class="sort-item"><input type="checkbox" id="hide-instructors"><label for="hide-instructors">Hide Instructors</label></div>'+
+        '<div class="sort-item"><input type="checkbox" id="hide-ca"><label for="hide-ca">Hide Course Assistants</label></div>'+
+        '<div class="sort-item"><input type="checkbox" id="hide-students"><label for="hide-students">Hide Students</label></div>'+
+        '</div>'
     },
     "aaSorting": [
       [3, "desc"]
     ],
     "aoColumnDefs": [
       { "bSortable": false, "aTargets": [ 0 ] },
-      {"bVisible": false, "aTargets": [7]}
+      {"bVisible": false, "aTargets": [7, 8]}
     ]
   });
 
-  $("#only-latest").on("change", function() {
+  $(".sort-item input").on("change", function() {
     table.draw();
   });
 

@@ -1089,3 +1089,19 @@ div.center {
 #submissions_length > label > .row{
   margin: 0;
 }
+
+.sort-item{
+  display: inline-block;
+}
+
+.sort-item:nth-child(n+2){
+  margin-left: 5px;
+}
+
+.sort-item:not(:last-child){
+  margin-right: 10px;
+}
+
+.sort-item label{
+  padding-left: 20px;
+}
