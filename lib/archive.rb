@@ -10,8 +10,12 @@ require "zip"
 #
 module Archive
   def self.get_files(archive_path)
-    archive_type = get_archive_type(archive_path)
-    archive_extract = get_archive(archive_path, archive_type)
+    begin
+      archive_type = get_archive_type(archive_path)
+      archive_extract = get_archive(archive_path, archive_type)
+    rescue Zip::Error => e
+      return e
+    end
     files = []
     begin
     # Parse archive header
