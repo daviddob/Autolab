@@ -1,4 +1,3 @@
-
 require "archive"
 require "pdf"
 require "prawn"
