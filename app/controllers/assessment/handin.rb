@@ -62,8 +62,12 @@ module AssessmentHandin
 
     # autograde the submissions
     autogradeSubmissions(@course, @assessment, submissions) if @assessment.has_autograder?
-
-    redirect_to([:history, @course, @assessment]) && return
+    
+    if @assessment.handin_redirect
+      redirect_to([:view, @course, @assessment, submissions[0]]) && return
+    else
+      redirect_to([:history, @course, @assessment]) && return
+    end
   end
 
   # method called when student makes

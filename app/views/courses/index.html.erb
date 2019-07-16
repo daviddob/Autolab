@@ -24,7 +24,7 @@
 
             <% if category != :completed %>
               <div class="collection blue darken-3">
-                <% course.current_assessments(DateTime.now, CourseUserDatum.where("user_id = ? AND course_id = ?", @current_user.id, course.id).first).each do |asmt| %>
+                <% course.current_assessments(DateTime.now, course_cud).each do |asmt| %>
                   <%= link_to asmt.display_name, course_assessment_path(course, asmt), class: "collection-item grey-text text-darken-4" %>
                 <% end %>
               </div>
