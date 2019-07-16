@@ -58,9 +58,7 @@
 
       <th>Total Score</th>
 
-      <% if @cud.instructor? then %>
-        <th>Tweak</th>
-      <% end %>
+      <th>Tweak</th>
 
     </tr>
   </thead>
@@ -110,10 +108,7 @@
       <%= computed_score { submission.final_score(@effectiveCud) } %>
     <% end %>
   </td>
-
-  <% if @cud.instructor? then %>
     <td><%== tweak(submission.tweak) %></td>
-  <% end %>
 </tr>
 
 </table>
