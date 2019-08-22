@@ -54,7 +54,7 @@
 
 <p>
 <table class="prettyBorder" id="submissions">
-  <% headers = ["Submitted By", "Version", "Submission Date (YYYY-MM-DD)", "File", "IP Address", "Actions", "isLatest"] %>
+  <% headers = ["Submitted By", "Version", "Submission Date (YYYY-MM-DD)", "File", "IP Address", "Actions", "isLatest", "role"] %>
   <% if @assessment.assignCA then %>
     <% headers.push("Grader") %>
   <% end %>
@@ -76,7 +76,7 @@
   </thead>
   <tbody>
   <% for submission in @submissions %>
-    <tr id="row-<%= submission.id %>" class="submission-row">
+    <tr id="row-<%= submission.id %>"  class="submission-row">
       <td><input name="cbox" class="cbox" type="checkbox" id="cbox-<%= submission.id %>"><label for="cbox"></label></td>
       <td><%= link_to submission.course_user_datum.email,
                       history_course_assessment_path(@course, @assessment, cud_id: submission.course_user_datum_id, partial: true),
@@ -112,7 +112,7 @@
               {:title=>"Destroy this submission forever",
                 :class=>"btn small"} %>
       </td>
-      <td><%= submission.latest? %>
+      <td style="display:none;"><%= submission.latest? %>
       </td>
       <% if @assessment.assignCA then %>
         <td><%= submission.grader %></td>
@@ -125,6 +125,7 @@
             <td><%= submission.getSettings[@assessment.getTextfields[i]] %></td>
         <% end %>
      <% end %>
+     <td style="display: none;"><%= submission.course_user_datum.get_role() %></td>
     </tr>
   <% end %>
   </tbody>
