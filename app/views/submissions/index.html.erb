@@ -112,8 +112,8 @@
               {:title=>"Destroy this submission forever",
                 :class=>"btn small"} %>
       </td>
-      <td style="display:none;"><%= submission.latest? %>
-      </td>
+      <td style="display:none;"><%= submission.latest? %></td>
+      <td style="display: none;"><%= submission.course_user_datum.get_role() %></td>
       <% if @assessment.assignCA then %>
         <td><%= submission.grader %></td>
       <% end %>
@@ -125,7 +125,6 @@
             <td><%= submission.getSettings[@assessment.getTextfields[i]] %></td>
         <% end %>
      <% end %>
-     <td style="display: none;"><%= submission.course_user_datum.get_role() %></td>
     </tr>
   <% end %>
   </tbody>
