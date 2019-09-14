@@ -63,7 +63,7 @@ class Course < ActiveRecord::Base
     if user == nil
       assessments.where("start_at < :now AND end_at > :now", now: now)
     else
-      assessments.where("start_at < :now", now: now).reject{|asmt| !asmt.is_released_for_this_user?(user) || asmt.aud_for(user.id).due_at < now}
+      assessments.where("start_at < :now", now: now).reject{|asmt| !asmt.is_released_for_this_user?(user) || (!asmt.aud_for(user.id).due_at.nil? && asmt.aud_for(user.id).due_at < now)}
     end
   end
 
