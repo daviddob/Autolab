@@ -79,12 +79,6 @@ class User < ActiveRecord::Base
     save
   end
 
-  def self.find_for_facebook_oauth(auth, _signed_in_resource = nil)
-    authentication = Authentication.find_by(provider: auth.provider,
-                                            uid: auth.uid)
-    return authentication.user if authentication && authentication.user
-  end
-
   def self.find_for_google_oauth2_oauth(auth, _signed_in_resource = nil)
     authentication = Authentication.find_by(provider: auth.provider,
                                             uid: auth.uid)
@@ -99,13 +93,7 @@ class User < ActiveRecord::Base
 
   def self.new_with_session(params, session)
     super.tap do |user|
-      if (data = session["devise.facebook_data"])
-        user.first_name = data["info"]["first_name"]
-        user.last_name = data["info"]["last_name"]
-        user.email = data["info"]["email"]
-        user.authentications.new(provider: data["provider"],
-                                 uid: data["uid"])
-      elsif (data = session["devise.google_oauth2_data"])
+      if (data = session["devise.google_oauth2_data"])
         user.first_name = data["info"]["first_name"]
         user.last_name = data["info"]["last_name"]
         user.email = data["info"]["email"]
