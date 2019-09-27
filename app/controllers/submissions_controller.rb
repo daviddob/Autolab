@@ -328,23 +328,23 @@ class SubmissionsController < ApplicationController
     @annotations.delete_if do |annotation|
       problem = annotation.problem ? annotation.problem.name : "General"
       if problem != "General" then
-        out = Score.where("submission_id = ? AND  problem_id = ?", @submission.id, Problem.where("assessment_id = ? AND name = ?", @assessment.id, problem).first.id).first.released
-        if out || (@cud.instructor || @cud.course_assistant) then
-          false
-        else
-          if(@assessment.grading_deadline.past?) then 
-            false
-          else
-            true
+        out = Score.find_or_initialize_by_submission_id_and_problem_id(@submission.id, annotation.problem.id)
+        # if for some reason annotation and scores are out of sync resync
+        if out.id.nil? then
+          begin
+            annotation.value = nil
+            annotation.problem = nil
+            annotation.save!
+          rescue ActiveRecord::RecordInvalid => invalid
+            flash[:error] = "Something has gone wrong a record is invalid please contact your professor."
+            redirect_to(course_assessment_path(@course, @assessment)) && return
+          rescue  ActiveRecord::RecordNotSaved => saved
+            flash[:error] = "Something has gone wrong a record could not be saved please contact your professor."
+            redirect_to(course_assessment_path(@course, @assessment)) && return
           end
         end
-      else
-        if(@assessment.grading_deadline.past? || (@cud.instructor || @cud.course_assistant)) then 
-          false
-        else
-          true
-        end
       end 
+      !(@cud.instructor || @cud.course_assistant || @assessment.grading_deadline.past?)
     end
     # extract information from annotations
     @annotations.each do |annotation|
