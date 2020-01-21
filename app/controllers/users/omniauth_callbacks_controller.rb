@@ -84,7 +84,9 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
         end
 
 				if @user.email.include? "@buffalo.edu"
-					@user.first_name = data["info"]["name"]
+          if @user.first_name.nil? || @user.first_name.empty?
+					 @user.first_name = data["info"]["name"]
+          end
           @user.last_name = data["info"]["last_name"]
           @user.person_number = data["info"]["person_number"]
         end
