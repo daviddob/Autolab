@@ -503,8 +503,8 @@ private
             fail "New user cannot be created in uploadRoster." if user.nil?
           else
             # Override current user
-            user.first_name = first_name
-            user.last_name = last_name
+            # user.first_name = first_name
+            # user.last_name = last_name
             user.school = school
             user.major = major
             user.year = year
@@ -554,8 +554,8 @@ private
           end
 
           # Update user data
-          user.first_name = newCUD[:first_name]
-          user.last_name = newCUD[:last_name]
+          # user.first_name = newCUD[:first_name]
+          # user.last_name = newCUD[:last_name]
           user.school = newCUD[:school]
           user.major = newCUD[:major]
           user.year = newCUD[:year]
