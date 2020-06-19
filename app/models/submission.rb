@@ -145,6 +145,7 @@ class Submission < ActiveRecord::Base
       if assessment.is_section_dependant
         form_hash["section"] = (assessment.lecture?) ? course_user_datum.lecture : course_user_datum.section
       end
+      form_hash["ip"] = self.submitter_ip
       self.settings = form_hash.to_json
       self.save!
   end
