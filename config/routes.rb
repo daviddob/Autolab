@@ -126,6 +126,8 @@ Autolab3::Application.routes.draw do
         get "installAssessment"
         post "importAssessment"
         post "importAsmtFromTar"
+        post "multiImport"
+        get "multiImport"
       end
     end
 
