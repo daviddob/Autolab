@@ -429,11 +429,15 @@ private
   def serialize
     s = {}
     s["general"] = serialize_general
+    s["handin"] = serialize_time_data
     s["problems"] = problems.map(&:serialize)
     s["autograder"] = autograder.serialize if has_autograder?
+    s["autograder"]["makefile"] = "autograde-Makefile" if has_autograder?
+    s["autograder"]["tarfile"] = "autograde.tar" if has_autograder?
     s["scoreboard"] = scoreboard.serialize if has_scoreboard?
     s["late_penalty"] = late_penalty.serialize if late_penalty
     s["version_penalty"] = version_penalty.serialize if version_penalty
+    s["book_keeping"] = {"interface_number" => Utilities.interface_number}
     s
   end
 
@@ -443,14 +447,30 @@ private
     Utilities.serializable attributes, GENERAL_SERIALIZABLE
   end
 
+  def serialize_time_data
+    s = {}
+    s["start_at"] = self.start_at.strftime('%s')
+    s["visible_at"] = self.visible_at.strftime('%s')
+    s["due_at"] = self.due_at.strftime('%s')
+    s["end_at"] = self.end_at.strftime('%s')
+    s["grading_deadline"] = self.grading_deadline.strftime('%s')
+    s
+  end
+
   def deserialize(s)
-    self.due_at = self.end_at = self.visible_at = self.start_at = self.grading_deadline = Time.now
+    self.start_at = Time.at(s["handin"]["visible_at"].to_i)
+    self.visible_at = Time.at(s["handin"]["start_at"].to_i)
+    self.due_at = Time.at(s["handin"]["due_at"].to_i)
+    self.end_at = Time.at(s["handin"]["end_at"].to_i)
+    self.grading_deadline = Time.at(s["handin"]["grading_deadline"].to_i)
+
     self.quiz = false
     self.quizData = ""
     update!(s["general"])
     Problem.deserialize_list(self, s["problems"]) if s["problems"]
     if s["autograder"]
-      Autograder.find_or_initialize_by(assessment_id: id).update(s["autograder"])
+      ag = Autograder.find_or_initialize_by(assessment_id: id)
+      ag.update( s["autograder"].reject{|k,v| !ag.attributes.keys.member?(k.to_s) })
     end
     if s["scoreboard"]
       Scoreboard.find_or_initialize_by(assessment_id: id).update(s["scoreboard"])
