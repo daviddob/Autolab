@@ -17,11 +17,11 @@ multiple assessment import starter.tar is the starter file for importing one or 
 ```bash
 multiple assessment import starter.tar
 ├── assessment1
-│   ├── assessment1.yml
+│   ├── properties.yml
 │   ├── autograde.tar
 │   └── autograde-Makefile
 └── assessment2
-    └── assessment1.yml
+    └── properties.yml
 
 ```
 
