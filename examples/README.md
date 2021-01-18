@@ -17,23 +17,19 @@ multiple assessment import starter.tar is the starter file for importing one or 
 ```bash
 multiple assessment import starter.tar
 ├── assessment1
-│   ├── handin
 │   ├── assessment1.yml
 │   ├── autograde.tar
 │   └── autograde-Makefile
 └── assessment2
-    ├── handin
     └── assessment1.yml
 
 ```
 
-the top level must consist of folders named the same as what you will be naming the course (url name not display name) 
+every folder in the tar represents a separate assessment
 
 assessment1 is an example of an assessment with an autograding component
 
-the handin folder while has to remain present and named the same is not currently used for anything but will be in the future for adding submissions to new assessments.
-
-assessment1.yml
+properties.yml
 ```YAML
 ---
 general:
@@ -50,6 +46,12 @@ general:
   max_size: 2
   has_svn: false
   category_name: Lab Activities
+handin:
+  start_at: '1523557920'
+  visible_at: '1523557967'
+  due_at: '1543692720'
+  end_at: '1543699920'
+  grading_deadline: '1543693720'
 problems:
 - name: Score
   description: ''
@@ -59,14 +61,25 @@ autograder:
   autograde_timeout: 180
   autograde_image: autograding_image
   release_score: true
+  makefile: autograde-Makefile
+  tarfile: autograde.tar
+book_keeping:
+  interface_number: 1000
+
 ```
-the only hiccup on this file is that the name field must be the same as the file and top level folder name
+this file must be named properties.yml
+
+name: must be url safe
+
+handin: times are seconds after epoch in UTC
+
+book_keeping: the interface number will be used to provided migration steps if the system changes too much to support old versions
 
 problems even if there is only 1 must be denoted as a list
 ~~~
 autograde-Makefile, autograde.tar
 ~~~
-will contain your assessment files to ship to tango and be graded with naming is standardized to avoid complications.
+will contain your assessment files to ship to tango and be graded, names of these must be provided in the YAML file
 
 assessment2 is an assessment without autograding same rules apply as assessment1 the only difference being the assessment.yml file does not contain the autograder section
 
@@ -86,6 +99,12 @@ general:
   max_size: 5
   has_svn: false
   category_name: RecitationQuiz
+handin:
+  start_at: '1523557920'
+  visible_at: '1523557967'
+  due_at: '1543692720'
+  end_at: '1543699920'
+  grading_deadline: '1543693720'
 problems:
 - name: quiz02
   description: ''
