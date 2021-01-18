@@ -1,7 +1,7 @@
 module Utilities
 
   def self.interface_number()
-    return 1000
+    return 1
   end
 
   def self.serializable(attributes, serializable)

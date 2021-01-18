@@ -437,7 +437,7 @@ private
     s["scoreboard"] = scoreboard.serialize if has_scoreboard?
     s["late_penalty"] = late_penalty.serialize if late_penalty
     s["version_penalty"] = version_penalty.serialize if version_penalty
-    s["book_keeping"] = {"interface_number" => Utilities.interface_number}
+    s["version"] = Utilities.interface_number
     s
   end
 
@@ -449,20 +449,20 @@ private
 
   def serialize_time_data
     s = {}
-    s["start_at"] = self.start_at.strftime('%s')
-    s["visible_at"] = self.visible_at.strftime('%s')
-    s["due_at"] = self.due_at.strftime('%s')
-    s["end_at"] = self.end_at.strftime('%s')
-    s["grading_deadline"] = self.grading_deadline.strftime('%s')
+    s["start_at"] = self.start_at.iso8601()
+    s["visible_at"] = self.visible_at.iso8601()
+    s["due_at"] = self.due_at.iso8601()
+    s["end_at"] = self.end_at.iso8601()
+    s["grading_deadline"] = self.grading_deadline.iso8601()
     s
   end
 
   def deserialize(s)
-    self.start_at = Time.at(s["handin"]["visible_at"].to_i)
-    self.visible_at = Time.at(s["handin"]["start_at"].to_i)
-    self.due_at = Time.at(s["handin"]["due_at"].to_i)
-    self.end_at = Time.at(s["handin"]["end_at"].to_i)
-    self.grading_deadline = Time.at(s["handin"]["grading_deadline"].to_i)
+    self.start_at = Time.iso8601(s["handin"]["visible_at"])
+    self.visible_at = Time.iso8601(s["handin"]["start_at"])
+    self.due_at = Time.iso8601(s["handin"]["due_at"])
+    self.end_at = Time.iso8601(s["handin"]["end_at"])
+    self.grading_deadline = Time.iso8601(s["handin"]["grading_deadline"])
 
     self.quiz = false
     self.quizData = ""

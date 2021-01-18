@@ -145,8 +145,10 @@ end"
 
       FileUtils.mv(directory,newAssessmentPath)
       FileUtils.mv(Rails.root.join(newAssessmentPath, "properties.yml"), Rails.root.join(newAssessmentPath, props["general"]["name"] + ".yml"))
-      FileUtils.mv(Rails.root.join(newAssessmentPath, props["autograder"]["tarfile"]), Rails.root.join(newAssessmentPath, "autograde.tar")) unless props["autograder"]["tarfile"] == "autograde.tar"
-      FileUtils.mv(Rails.root.join(newAssessmentPath, props["autograder"]["makefile"]), Rails.root.join(newAssessmentPath, "autograde-Makefile")) unless props["autograder"]["makefile"] == "autograde-Makefile"
+      if props.has_key?("autograder")
+        FileUtils.mv(Rails.root.join(newAssessmentPath, props["autograder"]["tarfile"]), Rails.root.join(newAssessmentPath, "autograde.tar")) unless props["autograder"]["tarfile"] == "autograde.tar"
+        FileUtils.mv(Rails.root.join(newAssessmentPath, props["autograder"]["makefile"]), Rails.root.join(newAssessmentPath, "autograde-Makefile")) unless props["autograder"]["makefile"] == "autograde-Makefile"
+      end
   end
 end
 

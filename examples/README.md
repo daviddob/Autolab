@@ -47,11 +47,11 @@ general:
   has_svn: false
   category_name: Lab Activities
 handin:
-  start_at: '1523557920'
-  visible_at: '1523557967'
-  due_at: '1543692720'
-  end_at: '1543699920'
-  grading_deadline: '1543693720'
+  start_at: '2018-04-12T14:32:00-04:00'
+  visible_at: '2018-04-12T14:32:00-04:00'
+  due_at: '2018-12-01T14:32:00-05:00'
+  end_at: '2018-12-01T16:32:00-05:00'
+  grading_deadline: '2018-12-01T14:48:00-05:00'
 problems:
 - name: Score
   description: ''
@@ -63,19 +63,22 @@ autograder:
   release_score: true
   makefile: autograde-Makefile
   tarfile: autograde.tar
-book_keeping:
-  interface_number: 1000
+version: 1
+
 
 ```
 this file must be named properties.yml
 
 name: must be url safe
 
-handin: times are seconds after epoch in UTC
+handin: times are in ISO 8601 format
 
-book_keeping: the interface number will be used to provided migration steps if the system changes too much to support old versions
+version: the version number will be used to provided migration steps if the system changes too much to support old versions
+
+category_name: will be created if not already present
 
 problems even if there is only 1 must be denoted as a list
+
 ~~~
 autograde-Makefile, autograde.tar
 ~~~
@@ -100,14 +103,15 @@ general:
   has_svn: false
   category_name: RecitationQuiz
 handin:
-  start_at: '1523557920'
-  visible_at: '1523557967'
-  due_at: '1543692720'
-  end_at: '1543699920'
-  grading_deadline: '1543693720'
+  start_at: '2018-04-12T14:32:00-04:00'
+  visible_at: '2018-04-12T14:32:00-04:00'
+  due_at: '2018-12-01T14:32:00-05:00'
+  end_at: '2018-12-01T16:32:00-05:00'
+  grading_deadline: '2018-12-01T14:48:00-05:00'
 problems:
 - name: quiz02
   description: ''
   max_score: 100.0
   optional: false
+version: 1
 ```

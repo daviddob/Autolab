@@ -293,8 +293,10 @@ def grade
   def multiImport
     if request.post?
       importAsmtFromTar
-      flash[:success] = "Assessments created"
-      redirect_to(course_path(@course)) && return
+      if flash[:error].nil?
+        flash[:success] = "Assessments created"
+        redirect_to(course_path(@course)) and return
+      end
     end
   end
 
