@@ -220,6 +220,7 @@ module AssessmentAutograde
                            File.open(f["localFile"], "rb").read)
       rescue TangoClient::TangoException => e
         flash[:error] = "Error while uploading autograding files: #{e.message}"
+        COURSE_LOGGER.log("Error while uploading autograding files: #{e.message}")
         return -4, nil
       end
     end
