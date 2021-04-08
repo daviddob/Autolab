@@ -1,4 +1,9 @@
 module Utilities
+
+  def self.interface_number()
+    return 1
+  end
+
   def self.serializable(attributes, serializable)
     attributes.keep_if { |f, _| serializable.include? f }
     attributes.delete_if { |_, v| v.nil? }

@@ -24,10 +24,13 @@ class AssessmentsController < ApplicationController
   autolab_require Rails.root.join("app", "controllers", "assessment", "autograde.rb")
   include AssessmentAutograde
 
+  autolab_require Rails.root.join("app", "controllers", "assessment", "import.rb")
+  include AssessmentImport
+
   # this is inherited from ApplicationController
   before_action :set_assessment, except: [:index, :new, :create, :installAssessment,
     :importAsmtFromTar, :importAssessment,
-    :log_submit, :local_submit, :autograde_done]
+    :log_submit, :local_submit, :autograde_done, :multiImport]
     before_action :set_submission, only: [:viewFeedback]
 
   # We have to do this here, because the modules don't inherit ApplicationController.
@@ -98,81 +101,6 @@ class AssessmentsController < ApplicationController
       @unused_config_files << filename unless assessment_exists
     end
     @unused_config_files.sort!
-  end
-
-  action_auth_level :importAsmtFromTar, :instructor
-  def importAsmtFromTar
-    tarFile = params["tarFile"]
-    if tarFile.nil?
-      flash[:error] = "Please select an assessment tarball for uploading."
-      redirect_to(action: "installAssessment")
-      return
-    end
-
-    begin
-      tarFile = File.new(tarFile.open, "rb")
-      tar_extract = Gem::Package::TarReader.new(tarFile)
-      tar_extract.rewind
-      is_valid_tar, asmt_name = valid_asmt_tar(tar_extract)
-      tar_extract.close
-      unless is_valid_tar
-        flash[:error] = "Invalid tarball. Please verify the existence of configuration files."
-        redirect_to(action: "installAssessment")
-        return
-      end
-    rescue StandardError => e
-      flash[:error] = "Error while reading the tarball -- #{e.message}."
-      redirect_to(action: "installAssessment")
-      return
-    end
-
-    # Check if the assessment already exists.
-    unless @course.assessments.find_by(name: asmt_name).nil?
-      flash[:error] = "An assessment with the same name already exists for the course. Please use a different name."
-      redirect_to(action: "installAssessment") && return
-    end
-
-    # If all requirements are satisfied, extract assessment files.
-    begin
-      course_root = Rails.root.join("courses", @course.name)
-      tar_extract.rewind
-      tar_extract.each do |entry|
-        relative_pathname = entry.full_name
-        if entry.directory?
-          FileUtils.mkdir_p(File.join(course_root, relative_pathname),
-            mode: entry.header.mode, verbose: false)
-        elsif entry.file?
-          FileUtils.mkdir_p(File.join(course_root, File.dirname(relative_pathname)),
-            mode: entry.header.mode, verbose: false)
-          File.open(File.join(course_root, relative_pathname), "wb") do |f|
-            f.write entry.read
-          end
-          FileUtils.chmod entry.header.mode, File.join(course_root, relative_pathname),
-          verbose: false
-        elsif entry.header.typeflag == "2"
-          File.symlink entry.header.linkname, File.join(course_root, relative_pathname)
-        end
-      end
-      tar_extract.close
-    rescue StandardError => e
-      flash[:error] = "Error while extracting tarball to server -- #{e.message}."
-      redirect_to(action: "installAssessment") && return
-    end
-
-    params[:assessment_name] = asmt_name
-    importAssessment && return
-  end
-
-  # importAssessment - Imports an existing assessment from local file.
-  # The main task of this function is to decide what category a newly
-  # installed assessment should be assigned to.
-  action_auth_level :importAssessment, :instructor
-  def importAssessment
-    @assessment = @course.assessments.new(name: params[:assessment_name])
-    @assessment.load_yaml # this will save the assessment
-    @assessment.construct_folder # make sure there's a handin folder, just in case
-    @assessment.load_config_file # only call this on saved assessments
-    redirect_to([@course, @assessment])
   end
 
   # create - Creates an assessment from an assessment directory
@@ -349,6 +277,28 @@ def grade
     end
   end
 
+
+    # importAssessment - Imports an existing assessment from local file.
+  # The main task of this function is to decide what category a newly
+  # installed assessment should be assigned to.
+  action_auth_level :importAssessment, :instructor
+  def importAssessment
+    @assessment = @course.assessments.new(name: params[:assessment_name])
+    @assessment.load_yaml # this will save the assessment
+    @assessment.construct_folder # make sure there's a handin folder, just in case
+    @assessment.load_config_file # only call this on saved assessments
+  end
+
+  action_auth_level :multiImport, :instructor
+  def multiImport
+    if request.post?
+      importAsmtFromTar
+      if flash[:error].nil?
+        flash[:success] = "Assessments created"
+        redirect_to(course_path(@course)) and return
+      end
+    end
+  end
 
 
 
@@ -780,30 +730,7 @@ def edit
     ass.permit!
   end
 
-  ##
-  # a valid assessment tar has a single root directory that's named after the
-  # assessment, containing an assessment yaml file and an assessment ruby file
-  #
-  def valid_asmt_tar(tar_extract)
-    asmt_name = nil
-    asmt_rb_exists = false
-    asmt_yml_exists = false
-    tar_extract.each do |entry|
-      pathname = entry.full_name
-      next if pathname.start_with? "."
-      pathname.chomp!("/") if entry.directory?
-      # nested directories are okay
-      if entry.directory? && pathname.count("/") == 0
-        return false if asmt_name
-        asmt_name = pathname
-      else
-        return false unless asmt_name
-        asmt_rb_exists = true if pathname == "#{asmt_name}/#{asmt_name}.rb"
-        asmt_yml_exists = true if pathname == "#{asmt_name}/#{asmt_name}.yml"
-      end
-    end
-    [asmt_rb_exists && asmt_yml_exists && (!asmt_name.nil?), asmt_name]
-  end
+
 
   # methods for sending different file packages depending on what button was clicked
 def exportEverything
@@ -904,4 +831,6 @@ def exportEverything
       redirect_to(:action => 'exportOptions') && return 
     end
   end
+
 end
+
