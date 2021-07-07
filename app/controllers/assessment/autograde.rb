@@ -108,6 +108,7 @@ module AssessmentAutograde
 
     last_submissions = @submissions.latest
 
+
     # Now regrade only the most recent submissions. Keep track of
     # any handins that fail.
     failed_jobs = 0
@@ -119,15 +120,16 @@ module AssessmentAutograde
           redirect_to([@course, @assessment, :submissions]) && return
         elsif job < 0 # autograding failed
           failed_jobs += 1
-          failed_list += "#{@submission.filename}: autograding error.<br>"
+          failed_list += "#{submission.filename}: #{flash[:error]}.<br>"
         end
       else
+        # abort submission.inspect
         failed_jobs += 1
-        failed_list += "#{submission.filename}: not found or not readable.<br>"
+        failed_list += "NIL submission decteced.<br>"
       end
     end
 
-    flash[:error] = "Warning: Could not regrade #{failed_jobs} submission(s):<br>" + failed_list if failed_jobs > 0
+    flash[:error] = "Error: Could not regrade #{failed_jobs} submission(s):<br>" + failed_list if failed_jobs > 0
 
     success_jobs = last_submissions.size - failed_jobs
     if success_jobs > 0
